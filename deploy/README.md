@@ -76,7 +76,7 @@ ssh-copy-id -i deploy_key.pub ubuntu@<IP-VPS>
 ssh-keyscan -t ed25519 <IP-VPS>        # skopiuj wynik do sekretu DEPLOY_KNOWN_HOSTS
 ```
 
-W repo: **Settings → Environments → New environment → `production`**, potem dodaj sekrety:
+W repo: **Settings → Environments → New environment → `Minecraft Server Dashboard Production`**, potem dodaj sekrety:
 
 | Sekret               | Wartość                                 |
 | -------------------- | --------------------------------------- |
