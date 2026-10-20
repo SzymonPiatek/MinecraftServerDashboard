@@ -39,8 +39,14 @@ describe("authentication", () => {
   });
 
   it("rejects wrong credentials with a generic message", async () => {
-    const wrongPassword = await agent.post("/api/auth/login").send({ ...ADMIN, password: "nope" }).expect(401);
-    const wrongUser = await agent.post("/api/auth/login").send({ username: "ghost", password: "nope" }).expect(401);
+    const wrongPassword = await agent
+      .post("/api/auth/login")
+      .send({ ...ADMIN, password: "nope" })
+      .expect(401);
+    const wrongUser = await agent
+      .post("/api/auth/login")
+      .send({ username: "ghost", password: "nope" })
+      .expect(401);
     expect(wrongPassword.body).toEqual(wrongUser.body);
   });
 

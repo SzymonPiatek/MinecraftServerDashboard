@@ -1,8 +1,6 @@
 import { z } from "zod";
 
-export const minecraftUsernameSchema = z
-  .string()
-  .regex(/^[A-Za-z0-9_]{3,16}$/, "Invalid Minecraft username");
+export const minecraftUsernameSchema = z.string().regex(/^[A-Za-z0-9_]{3,16}$/, "Invalid Minecraft username");
 
 export const serverStatusSchema = z.object({
   online: z.boolean(),

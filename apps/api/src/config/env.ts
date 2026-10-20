@@ -21,7 +21,10 @@ const envSchema = z.object({
   MC_STATUS_CACHE_MS: z.coerce.number().int().nonnegative().default(5000),
   RCON_PORT: z.coerce.number().int().positive().default(25575),
   RCON_PASSWORD: z.string().min(1),
-  MC_SYSTEMD_UNIT: z.string().regex(/^[\w@.-]+$/).default("minecraft"),
+  MC_SYSTEMD_UNIT: z
+    .string()
+    .regex(/^[\w@.-]+$/)
+    .default("minecraft"),
 });
 
 export type Env = z.infer<typeof envSchema>;
