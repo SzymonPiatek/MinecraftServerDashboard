@@ -1,0 +1,120 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--space-lg);
+}
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--color-paper-2);
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-snap);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-lift);
+}
+
+.state {
+  font-size: var(--text-display);
+  line-height: 1;
+}
+
+.state[data-online="true"] {
+  color: var(--color-ink);
+  text-decoration: underline 0.12em var(--color-online);
+  text-underline-offset: 0.12em;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+}
+
+.stats dt {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.stats dd {
+  margin: 0;
+  font-family: var(--font-code);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.motd {
+  padding: var(--space-md);
+  font-family: var(--font-code);
+  font-size: var(--text-sm);
+  background: var(--color-paper);
+  border: 1.5px dashed var(--color-ink-muted);
+  border-radius: var(--radius-input);
+}
+
+.warning {
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: var(--text-2xl);
+}
+
+.players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.player {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md) var(--space-xs) var(--space-xs);
+  font-weight: 600;
+  background: var(--color-paper);
+  border: 1.5px solid var(--color-ink);
+  border-radius: var(--radius-pill);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 8px;
+}
+
+.empty {
+  color: var(--color-ink-muted);
+  font-size: var(--text-lg);
+}
+
+@media (max-width: 52rem) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card {
+    padding: var(--space-lg);
+  }
+}

@@ -1,0 +1,30 @@
+.footer {
+  padding-block: var(--space-2xl);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 14vw, 9rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--color-accent);
+}
+
+.meta {
+  display: grid;
+  gap: var(--space-sm);
+  max-width: 40rem;
+}
+
+.small {
+  font-size: var(--text-sm);
+  opacity: 0.7;
+}
