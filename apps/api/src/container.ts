@@ -11,7 +11,7 @@ import {
   createMinecraftStatusService,
   type MinecraftStatusService,
 } from "./modules/minecraft/status.service.js";
-import { createSystemdService, type ServerControlService } from "./modules/server-control/systemd.service.js";
+import { createDockerService, type ServerControlService } from "./modules/server-control/docker.service.js";
 
 /** Everything the HTTP layer depends on; tests substitute fakes for any of these. */
 export interface Container {
@@ -52,7 +52,7 @@ export function createContainer(env: Env): Container {
     rcon,
     whitelist: createWhitelistService(rcon),
     players: createPlayersService(rcon),
-    serverControl: createSystemdService(env.MC_SYSTEMD_UNIT),
+    serverControl: createDockerService({ apiUrl: env.DOCKER_API_URL, containerName: env.MC_CONTAINER_NAME }),
     close: () => prisma.$disconnect(),
   };
 }
