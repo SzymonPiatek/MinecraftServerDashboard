@@ -37,8 +37,7 @@ export const siteConfig = {
     },
     {
       question: "Czy da się grać na Bedrocku, telefonie lub konsoli?",
-      answer:
-        "Serwer jest dla Minecraft Java Edition na komputerze. Wersje Bedrock nie są obsługiwane.",
+      answer: "Serwer jest dla Minecraft Java Edition na komputerze. Wersje Bedrock nie są obsługiwane.",
     },
     {
       question: "Jakie są zasady?",
