@@ -15,7 +15,7 @@ import { parseParam, validateBody } from "../../middleware/validate.js";
 import type { AuditService } from "../audit/audit.service.js";
 import { currentAdmin } from "../auth/require-admin.js";
 import type { RconClient } from "../minecraft/rcon.client.js";
-import type { ServerControlService } from "../server-control/systemd.service.js";
+import type { ServerControlService } from "../server-control/docker.service.js";
 import type { PlayersService } from "./players.service.js";
 import type { WhitelistService } from "./whitelist.service.js";
 

@@ -1,0 +1,92 @@
+# Production stack: Caddy (HTTPS) -> web + api, plus the Minecraft server and a restricted Docker proxy.
+# Variables come from the .env next to this file (see .env.example).
+
+services:
+  minecraft:
+    image: itzg/minecraft-server:${MC_IMAGE_TAG:-java25}
+    container_name: minecraft
+    restart: unless-stopped
+    stop_grace_period: 90s
+    mem_limit: 4g
+    environment:
+      EULA: "TRUE"
+      TYPE: CUSTOM
+      CUSTOM_SERVER: /data/server.jar
+      MEMORY: ${MC_MEMORY:-3G}
+      ENABLE_RCON: "true"
+      RCON_PASSWORD: ${RCON_PASSWORD:?set RCON_PASSWORD in .env}
+      ENABLE_QUERY: "true"
+      ENABLE_WHITELIST: "true"
+      ENFORCE_WHITELIST: "true"
+    volumes:
+      - ${MC_DATA_DIR:-/home/ubuntu/server}:/data
+    ports:
+      - "25565:25565" # game traffic only; RCON and Query stay on the internal network
+    networks: [internal]
+
+  # Lets the API inspect/start/stop/restart the minecraft container (and nothing else) without the raw Docker socket.
+  docker-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/socket-proxy.haproxy.cfg.template:/usr/local/etc/haproxy/haproxy.cfg.template:ro
+    networks: [control]
+
+  api:
+    image: ${IMAGE_PREFIX:-mcd}-api:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on: [minecraft, docker-proxy]
+    environment:
+      NODE_ENV: production
+      TRUST_PROXY: 1
+      WEB_ORIGIN: https://mc.spiatek.pl
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      MC_HOST: minecraft
+      MC_PORT: 25565
+      MC_QUERY_PORT: 25565
+      RCON_PORT: 25575
+      RCON_PASSWORD: ${RCON_PASSWORD}
+      MC_CONTAINER_NAME: minecraft
+      DOCKER_API_URL: http://docker-proxy:2375
+    volumes:
+      - api-data:/data
+    networks: [internal, control]
+
+  web:
+    image: ${IMAGE_PREFIX:-mcd}-web:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    networks: [internal]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [api, web]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [internal]
+
+networks:
+  internal:
+  # Only the API and the Docker proxy can reach each other here.
+  control:
+    internal: true
+
+volumes:
+  api-data:
+  caddy-data:
+  caddy-config:

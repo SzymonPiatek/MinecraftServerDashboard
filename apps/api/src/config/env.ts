@@ -21,10 +21,11 @@ const envSchema = z.object({
   MC_STATUS_CACHE_MS: z.coerce.number().int().nonnegative().default(5000),
   RCON_PORT: z.coerce.number().int().positive().default(25575),
   RCON_PASSWORD: z.string().min(1),
-  MC_SYSTEMD_UNIT: z
+  MC_CONTAINER_NAME: z
     .string()
-    .regex(/^[\w@.-]+$/)
+    .regex(/^[\w.-]+$/)
     .default("minecraft"),
+  DOCKER_API_URL: z.url().default("http://docker-proxy:2375"),
 });
 
 export type Env = z.infer<typeof envSchema>;
