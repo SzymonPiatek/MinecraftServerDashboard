@@ -1,15 +1,15 @@
-import express from "express";
-import helmet from "helmet";
+import { createApp } from "./app.js";
+import { parseEnv } from "./config/env.js";
+import { createContainer } from "./container.js";
 
-const app = express();
-app.use(helmet());
-app.use(express.json());
-
-app.get("/health", (_req, res) => {
-  res.json({ ok: true });
+const env = parseEnv();
+const container = createContainer(env);
+const server = createApp(container).listen(env.PORT, () => {
+  console.log(`API listening on :${env.PORT}`);
 });
 
-const port = Number(process.env.PORT ?? 4000);
-app.listen(port, () => {
-  console.log(`API listening on :${port}`);
-});
+const shutdown = () => {
+  server.close(() => void container.close().then(() => process.exit(0)));
+};
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
