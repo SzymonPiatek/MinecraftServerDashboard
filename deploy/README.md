@@ -2,7 +2,7 @@
 
 Schemat: Caddy (HTTPS) → `mc.spiatek.pl`: `/api/*` na API, reszta na web. Serwer Minecraft (`spiatek.pl:25565`), API, web, Caddy i proxy do Dockera działają w `docker-compose.yml`. Po pushu na `main` GitHub Actions buduje obrazy, wypycha je do GHCR i przez SSH uruchamia `deploy/deploy.sh` na VPS-ie.
 
-Założenia: użytkownik `ubuntu` (UID 1000), repo w `~/app`, świat Minecrafta w `~/server`.
+Założenia: użytkownik `ubuntu` (UID 1000), repo w `~/dashboard`, świat Minecrafta w `~/server`.
 
 ## 1. VPS: przygotowanie
 
@@ -37,13 +37,13 @@ Uwaga: obraz `itzg/minecraft-server` nadpisuje przy starcie część ustawień w
 **Repozytorium** (publiczne, więc bez kluczy):
 
 ```bash
-git clone https://github.com/SzymonPiatek/MinecraftServerDashboard.git ~/app
+git clone https://github.com/SzymonPiatek/MinecraftServerDashboard.git ~/dashboard
 ```
 
-**`~/app/.env`:**
+**`~/dashboard/.env`:**
 
 ```bash
-cd ~/app && cat > .env <<EOF
+cd ~/dashboard && cat > .env <<EOF
 IMAGE_PREFIX=ghcr.io/szymonpiatek/minecraftserverdashboard
 IMAGE_TAG=latest
 JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n')
@@ -95,7 +95,7 @@ Potem usuń lokalnie `deploy_key` i `deploy_key.pub`.
 4. Na VPS-ie utwórz konto admina:
 
 ```bash
-cd ~/app && docker compose exec api node dist/scripts/seed-admin.js
+cd ~/dashboard && docker compose exec api node dist/scripts/seed-admin.js
 ```
 
 Od teraz każdy push na `main` wdraża się sam.
@@ -103,7 +103,7 @@ Od teraz każdy push na `main` wdraża się sam.
 ## 4. Sprawdzenie
 
 ```bash
-cd ~/app
+cd ~/dashboard
 docker compose ps                          # wszystkie usługi Up, api/web/minecraft healthy
 docker compose logs -f minecraft          # "Done (...)!" oznacza, że serwer wystartował
 curl -s https://mc.spiatek.pl/api/status  # "online": true
@@ -113,7 +113,7 @@ Następnie zaloguj się przez `POST /api/auth/login` i wyślij komendę `list` p
 
 ## 5. Na co dalej uważać
 
-- **Wycofanie zmian:** `cd ~/app && IMAGE_TAG=sha-<stary-commit> docker compose up -d` (tagi są widoczne w paczkach na GitHubie).
+- **Wycofanie zmian:** `cd ~/dashboard && IMAGE_TAG=sha-<stary-commit> docker compose up -d` (tagi są widoczne w paczkach na GitHubie).
 - **Kopie zapasowe:** świat w `~/server` oraz baza w wolumenie `api-data` (`docker run --rm --volumes-from $(docker compose ps -q api) -v $PWD:/b alpine tar czf /b/api-data.tgz -C /data .`).
 - **Restart serwera MC** nie następuje przy zwykłym deployu strony (Compose przeładowuje tylko zmienione usługi).
 - Po utworzeniu admina możesz usunąć `ADMIN_PASSWORD` z `.env` i zrobić `docker compose up -d`.
