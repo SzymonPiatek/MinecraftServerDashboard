@@ -1,3 +1,13 @@
 .idea
 venv
 env
+extra
+node_modules
+dist
+.next
+.turbo
+*.db
+*.db-journal
+.env
+.env.*
+!.env.example
