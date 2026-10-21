@@ -13,10 +13,10 @@ const blockVariants = cva("absolute h-auto transition-[scale] duration-240 ease-
 
 /** Positions are percentages of the 400×420 art box, so the stack scales with its container. */
 const BLOCKS = [
-  { src: "/Crafting_Table.png", alt: "Crafting Table", float: "slow", left: 4, top: 40, size: 58 },
-  { src: "/Furnace.png", alt: "Furnace", float: "mid", left: 58, top: 6, size: 38 },
-  { src: "/Glowstone.png", alt: "Glowstone", float: "fast", left: 8, top: 4, size: 32 },
-  { src: "/Diamond_Ore.png", alt: "Diamond Ore", float: "mid", left: 64, top: 54, size: 34 },
+  { src: "/blocks/Crafting_Table.png", alt: "Crafting Table", float: "slow", left: 4, top: 40, size: 58 },
+  { src: "/blocks/Furnace.png", alt: "Furnace", float: "mid", left: 58, top: 6, size: 38 },
+  { src: "/blocks/Glowstone.png", alt: "Glowstone", float: "fast", left: 8, top: 4, size: 32 },
+  { src: "/blocks/Diamond_Ore.png", alt: "Diamond Ore", float: "mid", left: 64, top: 54, size: 34 },
 ] as const;
 
 export function BlockArt() {
