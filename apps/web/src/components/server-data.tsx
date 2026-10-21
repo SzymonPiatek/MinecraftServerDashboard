@@ -8,7 +8,6 @@ const REFRESH_MS = 15_000;
 interface ServerData {
   status: ServerStatus | null;
   players: OnlinePlayers | null;
-  /** True when the API itself couldn't be reached (distinct from the game server being offline). */
   unreachable: boolean;
 }
 

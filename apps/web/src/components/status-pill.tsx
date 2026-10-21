@@ -1,7 +1,7 @@
 "use client";
 
 import { useServerData } from "./server-data";
-import styles from "./status-pill.module.css";
+import { Badge, Dot } from "./ui/badge";
 
 export function StatusPill() {
   const { status, unreachable } = useServerData();
@@ -19,9 +19,9 @@ export function StatusPill() {
   }
 
   return (
-    <p className={styles.pill} data-state={state}>
-      <span className={styles.dot} aria-hidden="true" />
+    <Badge tone="muted" leading="dot">
+      <Dot state={state} />
       {label}
-    </p>
+    </Badge>
   );
 }

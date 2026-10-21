@@ -1,18 +1,16 @@
 import { ContactForm } from "./contact-form";
+import { Container, Section, SectionHead } from "./ui/section";
 
 export function ContactSection() {
   return (
-    <section id="kontakt" className="section">
-      <div className="container">
-        <div className="section-head">
-          <h2>Napisz do admina</h2>
-          <p>
-            Chcesz się dopisać do whitelisty, masz pytanie albo pomysł? Wyślij wiadomość, odpiszę na podany
-            e-mail.
-          </p>
-        </div>
+    <Section id="kontakt">
+      <Container>
+        <SectionHead
+          title="Napisz do admina"
+          description="Chcesz się dopisać do whitelisty, masz pytanie albo pomysł? Wyślij wiadomość, odpiszę na podany e-mail."
+        />
         <ContactForm />
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

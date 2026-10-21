@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "./copy-address.module.css";
+import { Button } from "./ui/button";
 
 export function CopyAddress({ address }: { address: string }) {
   const [copied, setCopied] = useState(false);
@@ -22,12 +22,19 @@ export function CopyAddress({ address }: { address: string }) {
   }
 
   return (
-    <div className={styles.group}>
-      <button type="button" className={styles.button} onClick={copy}>
-        <code className={styles.address}>{address}</code>
-        <span className={styles.action}>{copied ? "Skopiowano!" : "Kopiuj IP"}</span>
-      </button>
-      <span className={styles.live} role="status" aria-live="polite">
+    <div className="relative inline-block max-w-full">
+      <Button
+        variant="secondary"
+        size="flush"
+        className="max-w-full items-stretch font-normal"
+        onClick={copy}
+      >
+        <code className="min-w-0 truncate px-6 py-4 font-mono text-lg">{address}</code>
+        <span className="flex items-center rounded-r-lg border-l-2 border-ink bg-accent px-6 font-bold whitespace-nowrap">
+          {copied ? "Skopiowano!" : "Kopiuj IP"}
+        </span>
+      </Button>
+      <span className="sr-only" role="status" aria-live="polite">
         {copied ? "Adres skopiowany do schowka" : ""}
       </span>
     </div>

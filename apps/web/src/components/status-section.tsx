@@ -1,13 +1,24 @@
 "use client";
 
 import { useServerData } from "./server-data";
-import styles from "./status-section.module.css";
+import { cn } from "@/lib/cn";
+import { Avatar, AVATAR_TINTS } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import { Card } from "./ui/card";
+import { Container, Section, SectionHead } from "./ui/section";
 
-const AVATAR_TINTS = ["--color-accent", "--color-mint", "--color-accent-2", "--color-accent-3"];
-
-function tintFor(name: string): string {
+function tintFor(name: string) {
   const hash = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return AVATAR_TINTS[hash % AVATAR_TINTS.length];
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-sm text-ink-muted">{label}</dt>
+      <dd className="m-0 font-mono text-lg font-medium wrap-anywhere">{value}</dd>
+    </div>
+  );
 }
 
 export function StatusSection() {
@@ -15,16 +26,25 @@ export function StatusSection() {
   const loading = !status && !unreachable;
 
   return (
-    <section id="status" className="section">
-      <div className="container">
-        <div className="section-head">
-          <h2>Status na żywo</h2>
-          <p>Dane odświeżają się same co kilkanaście sekund.</p>
-        </div>
+    <Section id="status">
+      <Container>
+        <SectionHead title="Status na żywo" description="Dane odświeżają się same co kilkanaście sekund." />
 
-        <div className={styles.grid}>
-          <article className={styles.card}>
-            <h3 className={styles.state} data-online={status?.online ?? false}>
+        <div className="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          <Card
+            as="article"
+            tone="muted"
+            padding="lg"
+            elevated
+            interactive
+            className="grid content-start gap-6"
+          >
+            <h3
+              className={cn(
+                "text-display leading-none",
+                status?.online && "underline decoration-online decoration-[0.12em] underline-offset-[0.12em]",
+              )}
+            >
               {loading
                 ? "Sprawdzam…"
                 : unreachable && !status
@@ -33,53 +53,55 @@ export function StatusSection() {
                     ? "Online"
                     : "Offline"}
             </h3>
-            <dl className={styles.stats}>
-              <div>
-                <dt>Gracze</dt>
-                <dd>{status?.online ? `${status.playersOnline}/${status.playersMax}` : "—"}</dd>
-              </div>
-              <div>
-                <dt>Ping</dt>
-                <dd>{status?.online && status.pingMs !== null ? `${Math.round(status.pingMs)} ms` : "—"}</dd>
-              </div>
-              <div>
-                <dt>Wersja</dt>
-                <dd>{status?.version ?? "—"}</dd>
-              </div>
+            <dl className="m-0 grid grid-cols-3 gap-4">
+              <Stat
+                label="Gracze"
+                value={status?.online ? `${status.playersOnline}/${status.playersMax}` : "—"}
+              />
+              <Stat
+                label="Ping"
+                value={status?.online && status.pingMs !== null ? `${Math.round(status.pingMs)} ms` : "—"}
+              />
+              <Stat label="Wersja" value={status?.version ?? "—"} />
             </dl>
-            <p className={styles.motd}>{status?.motd || "Brak opisu serwera."}</p>
+            <p className="rounded-input border-[1.5px] border-dashed border-ink-muted bg-paper p-4 font-mono text-sm">
+              {status?.motd || "Brak opisu serwera."}
+            </p>
             {unreachable && (
-              <p className={styles.warning} role="alert">
+              <p className="text-sm font-semibold" role="alert">
                 Nie udało się odświeżyć danych. Spróbuję ponownie za chwilę.
               </p>
             )}
-          </article>
+          </Card>
 
-          <article className={styles.card}>
-            <h3 className={styles.subtitle}>Kto gra teraz</h3>
+          <Card
+            as="article"
+            tone="muted"
+            padding="lg"
+            elevated
+            interactive
+            className="grid content-start gap-6"
+          >
+            <h3 className="text-2xl">Kto gra teraz</h3>
             {players && players.players.length > 0 ? (
-              <ul className={styles.players}>
+              <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
                 {players.players.map((name) => (
-                  <li key={name} className={styles.player}>
-                    <span
-                      className={styles.avatar}
-                      style={{ background: `var(${tintFor(name)})` }}
-                      aria-hidden="true"
-                    >
-                      {name.charAt(0).toUpperCase()}
-                    </span>
-                    {name}
+                  <li key={name}>
+                    <Badge leading="avatar" className="text-base">
+                      <Avatar tint={tintFor(name)}>{name.charAt(0).toUpperCase()}</Avatar>
+                      {name}
+                    </Badge>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className={styles.empty}>
+              <p className="text-lg text-ink-muted">
                 {status?.online ? "Nikogo nie ma. Bądź pierwszy!" : "Lista graczy jest teraz niedostępna."}
               </p>
             )}
-          </article>
+          </Card>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
