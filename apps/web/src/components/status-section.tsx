@@ -16,9 +16,11 @@ function tintFor(name: string) {
 
 function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div>
-      <dt className="text-sm text-ink-muted">{label}</dt>
-      <dd className="m-0 flex items-center gap-2 font-mono text-lg font-medium wrap-anywhere">{value}</dd>
+    <div className="flex min-w-0 items-center justify-between gap-4 sm:block">
+      <dt className="text-sm whitespace-nowrap text-ink-muted">{label}</dt>
+      <dd className="m-0 flex min-w-0 items-center gap-2 font-mono text-lg font-medium whitespace-nowrap">
+        {value}
+      </dd>
     </div>
   );
 }
@@ -47,7 +49,16 @@ export function StatusSection() {
   return (
     <Section id="status">
       <Container>
-        <SectionHead title="Status na żywo" description="Dane odświeżają się same co kilkanaście sekund." />
+        <SectionHead
+          nowrap
+          title="Status na żywo"
+          description={
+            <>
+              <span className="sm:hidden">Dane odświeżają się same.</span>
+              <span className="max-sm:hidden">Dane odświeżają się same co kilkanaście sekund.</span>
+            </>
+          }
+        />
 
         <div className="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
           <Card
@@ -56,11 +67,11 @@ export function StatusSection() {
             padding="lg"
             elevated
             interactive
-            className="grid content-start gap-6"
+            className="@container grid content-start gap-6 max-md:p-4"
           >
             <h3
               className={cn(
-                "text-display leading-none",
+                "text-[min(var(--text-display),14cqw)] leading-none whitespace-nowrap",
                 status?.online && "underline decoration-online decoration-[0.12em] underline-offset-[0.12em]",
               )}
             >
@@ -72,7 +83,7 @@ export function StatusSection() {
                     ? "Online"
                     : "Offline"}
             </h3>
-            <dl className="m-0 grid grid-cols-3 gap-4">
+            <dl className="m-0 grid gap-3 sm:grid-cols-3 sm:gap-4">
               <Stat
                 label="Gracze"
                 value={
@@ -91,14 +102,15 @@ export function StatusSection() {
                   </>
                 }
               />
-              <Stat label="Wersja" value={status?.version ?? "—"} />
+              <Stat label="Wersja" value={<span className="truncate">{status?.version ?? "—"}</span>} />
             </dl>
             <p className="rounded-input border-[1.5px] border-dashed border-ink-muted bg-paper p-4 font-mono text-sm">
               {status?.motd || "Brak opisu serwera."}
             </p>
             {unreachable && (
-              <p className="text-sm font-semibold" role="alert">
-                Nie udało się odświeżyć danych. Spróbuję ponownie za chwilę.
+              <p className="text-[min(0.875rem,4.4cqw)] font-semibold whitespace-nowrap" role="alert">
+                Nie udało się odświeżyć danych.
+                <span className="max-sm:hidden"> Spróbuję ponownie za chwilę.</span>
               </p>
             )}
           </Card>
@@ -109,14 +121,14 @@ export function StatusSection() {
             padding="lg"
             elevated
             interactive
-            className="grid content-start gap-6"
+            className="@container grid content-start gap-6 max-md:p-4"
           >
-            <h3 className="text-2xl">Kto gra teraz</h3>
+            <h3 className="text-[min(2rem,9cqw)] whitespace-nowrap">Kto gra teraz</h3>
             {players && players.players.length > 0 ? (
               <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
                 {players.players.map((name) => (
                   <li key={name}>
-                    <Badge leading="avatar" className="text-base">
+                    <Badge leading="avatar" className="text-base whitespace-nowrap">
                       <Avatar tint={tintFor(name)}>{name.charAt(0).toUpperCase()}</Avatar>
                       {name}
                     </Badge>
@@ -124,7 +136,7 @@ export function StatusSection() {
                 ))}
               </ul>
             ) : (
-              <p className="text-lg text-ink-muted">
+              <p className="text-[min(1.25rem,5.2cqw)] whitespace-nowrap text-ink-muted">
                 {status?.online ? "Nikogo nie ma. Bądź pierwszy!" : "Lista graczy jest teraz niedostępna."}
               </p>
             )}
