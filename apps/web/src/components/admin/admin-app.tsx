@@ -2,11 +2,12 @@
 
 import { useAdminSession } from "@/hooks/use-admin-session";
 import { Dashboard } from "./dashboard";
+import { PropertiesView } from "./properties-view";
 import { LoginForm } from "./login-form";
 import { GamerulesView } from "./gamerules-view";
 import { LogsView } from "./logs-view";
 
-const VIEWS = { dashboard: Dashboard, logs: LogsView, gamerules: GamerulesView };
+const VIEWS = { dashboard: Dashboard, logs: LogsView, gamerules: GamerulesView, properties: PropertiesView };
 
 export function AdminApp({ view = "dashboard" }: { view?: keyof typeof VIEWS }) {
   const { session, signIn, signOut } = useAdminSession();

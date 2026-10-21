@@ -2,6 +2,8 @@ import {
   consoleCommandBodySchema,
   gameruleBodySchema,
   gameruleNameSchema,
+  propertiesUpdateBodySchema,
+  type PropertiesUpdateBody,
   type GameruleBody,
   playerActionSchema,
   playerReasonBodySchema,
@@ -14,6 +16,7 @@ import {
 } from "@mcd/shared";
 import { Router, type RequestHandler } from "express";
 import { z } from "zod";
+import { HttpError } from "../../lib/http-error.js";
 import { parseParam, validateBody } from "../../middleware/validate.js";
 import type { AuditService } from "../audit/audit.service.js";
 import { currentAdmin } from "../auth/require-admin.js";
@@ -21,6 +24,7 @@ import type { RconClient } from "../minecraft/rcon.client.js";
 import type { ServerControlService } from "../server-control/docker.service.js";
 import type { BansService } from "./bans.service.js";
 import type { GamerulesService } from "./gamerules.service.js";
+import type { PropertiesService } from "./properties.service.js";
 import type { PlayersService } from "./players.service.js";
 import type { WhitelistService } from "./whitelist.service.js";
 
@@ -30,6 +34,7 @@ interface AdminRoutesOptions {
   players: PlayersService;
   bans: BansService;
   gamerules: GamerulesService;
+  properties: PropertiesService;
   rcon: RconClient;
   serverControl: ServerControlService;
   audit: AuditService;
@@ -39,7 +44,7 @@ const logsAfterSchema = z.iso.datetime().optional();
 const auditLimitSchema = z.coerce.number().int().min(1).max(200).default(50);
 
 export function createAdminRoutes(deps: AdminRoutesOptions): Router {
-  const { requireAdmin, whitelist, players, bans, gamerules, rcon, serverControl, audit } = deps;
+  const { requireAdmin, whitelist, players, bans, gamerules, properties, rcon, serverControl, audit } = deps;
   const router = Router();
   router.use(requireAdmin);
 
@@ -83,6 +88,34 @@ export function createAdminRoutes(deps: AdminRoutesOptions): Router {
       details: String(value),
     });
     res.json({ name, value });
+  });
+
+  // --- server.properties ---
+  router.get("/properties", async (_req, res) => {
+    res.json({ properties: await properties.list() });
+  });
+
+  router.put("/properties", validateBody(propertiesUpdateBodySchema), async (req, res) => {
+    const { changes, restart } = req.body as PropertiesUpdateBody;
+    const adminId = currentAdmin(req).id;
+
+    const changed = await properties.update(changes);
+    if (changed.length > 0) {
+      await audit.record({
+        adminId,
+        action: "properties.update",
+        details: `${changed.join(", ")}${restart ? " (with restart)" : ""}`,
+      });
+    }
+    if (restart) {
+      try {
+        await serverControl.control("restart");
+      } catch {
+        throw HttpError.unavailable("Saved, but could not restart the server");
+      }
+      await audit.record({ adminId, action: "server.restart" });
+    }
+    res.json({ saved: changed.length, restarted: restart });
   });
 
   // --- Player management (kick, ban, pardon, op, deop) ---

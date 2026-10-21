@@ -38,10 +38,11 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
 function PageLinks() {
   const router = useRouter();
   return (
-    <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
       {[
         { href: "/admin/logs", label: "Logi serwera" },
         { href: "/admin/gamerules", label: "Zarządzaj gamerule" },
+        { href: "/admin/properties", label: "Edycja właściwości" },
       ].map(({ href, label }) => (
         <Button
           key={href}

@@ -128,6 +128,64 @@ describe("admin gamerules", () => {
   });
 });
 
+describe("admin properties", () => {
+  it("lists them without the RCON password and requires a session", async () => {
+    await agent.get("/api/admin/properties").expect(401);
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/properties").expect(200);
+    expect(res.body.properties.map((p: { key: string }) => p.key)).toEqual([
+      "motd",
+      "max-players",
+      "pvp",
+      "server-port",
+    ]);
+    expect(JSON.stringify(res.body)).not.toContain("hunter2");
+  });
+
+  it("saves without a restart", async () => {
+    await loginAsAdmin();
+    const res = await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "max-players": "40" }, restart: false })
+      .expect(200);
+    expect(res.body).toEqual({ saved: 1, restarted: false });
+    expect(harness.propertiesFile.text).toContain("max-players=40");
+    expect(harness.serverActions).toEqual([]);
+    expect(harness.auditEvents.at(-1)).toMatchObject({ action: "properties.update", details: "max-players" });
+  });
+
+  it("saves and restarts", async () => {
+    await loginAsAdmin();
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { pvp: "false" }, restart: true })
+      .expect(200);
+    expect(harness.propertiesFile.text).toContain("pvp=false");
+    expect(harness.serverActions).toEqual(["restart"]);
+    expect(harness.auditEvents.map((e) => e.action)).toEqual(["properties.update", "server.restart"]);
+  });
+
+  it("rejects locked keys and bad values without touching the file", async () => {
+    await loginAsAdmin();
+    const before = harness.propertiesFile.text;
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "server-port": "1" }, restart: false })
+      .expect(400);
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "max-players": "x" }, restart: false })
+      .expect(400);
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "bad key": "x" }, restart: false })
+      .expect(400);
+    await agent.put("/api/admin/properties").send({ changes: {}, restart: "yes" }).expect(400);
+    expect(harness.propertiesFile.text).toBe(before);
+    expect(harness.serverActions).toEqual([]);
+  });
+});
+
 describe("admin whitelist", () => {
   it("lists, adds and removes players, auditing mutations", async () => {
     await loginAsAdmin();
