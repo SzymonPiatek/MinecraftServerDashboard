@@ -13,7 +13,16 @@ async function loginAsAdmin() {
 }
 
 beforeEach(async () => {
-  harness = await createTestContainer({ "whitelist list": "There are 2 whitelisted player(s): Alex, Steve" });
+  harness = await createTestContainer({
+    "whitelist list": "There are 2 whitelisted player(s): Alex, Steve",
+    "help gamerule":
+      "/gamerule keep_inventory [<value>]/gamerule minecraft:keep_inventory [<value>]/gamerule brand_new_rule [<value>]",
+    "gamerule keep_inventory": "Gamerule keep_inventory is currently set to: true",
+    "gamerule brand_new_rule": "Gamerule brand_new_rule is currently set to: 7",
+    "gamerule keep_inventory false": "Gamerule keep_inventory is now set to: false",
+    "gamerule keep_inventory 5": "Incorrect argument for command",
+    "banlist players": "There are 1 ban(s):\nSteve was banned by Rcon: griefing",
+  });
   agent = request.agent(createApp(harness.container));
 });
 
@@ -63,6 +72,117 @@ describe("authentication", () => {
 
   it("validates the login body", async () => {
     await agent.post("/api/auth/login").send({}).expect(400);
+  });
+});
+
+describe("admin bans", () => {
+  it("lists banned players", async () => {
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/bans").expect(200);
+    expect(res.body.players).toEqual([{ name: "Steve", reason: "griefing" }]);
+  });
+});
+
+describe("admin logs", () => {
+  it("requires a session and validates the cursor", async () => {
+    await agent.get("/api/admin/logs").expect(401);
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/logs").expect(200);
+    expect(res.body.lines).toHaveLength(1);
+    await agent.get("/api/admin/logs").query({ after: "yesterday" }).expect(400);
+  });
+});
+
+describe("admin gamerules", () => {
+  it("lists the rules the server answers for, including ones it reports itself", async () => {
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/gamerules").expect(200);
+    expect(res.body.rules).toEqual([
+      { name: "brand_new_rule", value: 7 },
+      { name: "keep_inventory", value: true },
+    ]);
+  });
+
+  it("sets a rule and audits it", async () => {
+    await loginAsAdmin();
+    await agent.put("/api/admin/gamerules/keep_inventory").send({ value: false }).expect(200);
+    expect(harness.rconCommands).toContain("gamerule keep_inventory false");
+    expect(harness.auditEvents.at(-1)).toMatchObject({
+      action: "gamerule.set",
+      target: "keep_inventory",
+      details: "false",
+    });
+  });
+
+  it("rejects values the server refuses and names that could inject commands", async () => {
+    await loginAsAdmin();
+    await agent.put("/api/admin/gamerules/keep_inventory").send({ value: 5 }).expect(400);
+    await agent.put("/api/admin/gamerules/keep_inventory").send({ value: "x" }).expect(400);
+    await agent.put("/api/admin/gamerules/a%20b").send({ value: true }).expect(400);
+    await agent.put("/api/admin/gamerules/Keep_Inventory").send({ value: true }).expect(400);
+    expect(harness.rconCommands).not.toContain("gamerule a b true");
+  });
+
+  it("requires a session", async () => {
+    await agent.get("/api/admin/gamerules").expect(401);
+  });
+});
+
+describe("admin properties", () => {
+  it("lists them without the RCON password and requires a session", async () => {
+    await agent.get("/api/admin/properties").expect(401);
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/properties").expect(200);
+    expect(res.body.properties.map((p: { key: string }) => p.key)).toEqual([
+      "motd",
+      "max-players",
+      "pvp",
+      "server-port",
+    ]);
+    expect(JSON.stringify(res.body)).not.toContain("hunter2");
+  });
+
+  it("saves without a restart", async () => {
+    await loginAsAdmin();
+    const res = await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "max-players": "40" }, restart: false })
+      .expect(200);
+    expect(res.body).toEqual({ saved: 1, restarted: false });
+    expect(harness.propertiesFile.text).toContain("max-players=40");
+    expect(harness.serverActions).toEqual([]);
+    expect(harness.auditEvents.at(-1)).toMatchObject({ action: "properties.update", details: "max-players" });
+  });
+
+  it("saves and restarts", async () => {
+    await loginAsAdmin();
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { pvp: "false" }, restart: true })
+      .expect(200);
+    expect(harness.propertiesFile.text).toContain("pvp=false");
+    expect(harness.serverActions).toEqual(["restart"]);
+    expect(harness.auditEvents.map((e) => e.action)).toEqual(["properties.update", "server.restart"]);
+  });
+
+  it("rejects locked keys and bad values without touching the file", async () => {
+    await loginAsAdmin();
+    const before = harness.propertiesFile.text;
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "server-port": "1" }, restart: false })
+      .expect(400);
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "max-players": "x" }, restart: false })
+      .expect(400);
+    await agent
+      .put("/api/admin/properties")
+      .send({ changes: { "bad key": "x" }, restart: false })
+      .expect(400);
+    await agent.put("/api/admin/properties").send({ changes: {}, restart: "yes" }).expect(400);
+    expect(harness.propertiesFile.text).toBe(before);
+    expect(harness.serverActions).toEqual([]);
   });
 });
 

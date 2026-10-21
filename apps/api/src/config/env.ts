@@ -22,6 +22,8 @@ const envSchema = z.object({
   MC_QUERY_PORT: z.coerce.number().int().positive().default(25565),
   MC_TIMEOUT_MS: z.coerce.number().int().positive().default(3000),
   MC_STATUS_CACHE_MS: z.coerce.number().int().nonnegative().default(5000),
+  /** RCON may sit behind a tunnel (local dev) while status uses the public address; defaults to MC_HOST. */
+  RCON_HOST: optionalString,
   RCON_PORT: z.coerce.number().int().positive().default(25575),
   RCON_PASSWORD: z.string().min(1),
   MC_CONTAINER_NAME: z

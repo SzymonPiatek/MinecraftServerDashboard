@@ -1,6 +1,10 @@
 import type {
   AdminSession,
   AuditLogEntry,
+  BannedPlayer,
+  Gamerule,
+  ServerProperty,
+  LogLine,
   ContactBody,
   LoginBody,
   OnlinePlayers,
@@ -46,6 +50,23 @@ export const adminActions = {
     apiFetcher(apiRoutes.admin.whitelist, { method: "POST", body: { username } }),
   removeFromWhitelist: (username: string) =>
     apiFetcher(apiRoutes.admin.whitelistEntry(username), { method: "DELETE" }),
+
+  getLogs: (after?: string, { signal }: WithSignal = {}) =>
+    apiFetcher<{ lines: LogLine[] }>(apiRoutes.admin.logs, { query: { after }, signal }),
+
+  getGamerules: () => apiFetcher<{ rules: Gamerule[] }>(apiRoutes.admin.gamerules),
+  setGamerule: (name: string, value: boolean | number) =>
+    apiFetcher<Gamerule>(apiRoutes.admin.gamerule(name), { method: "PUT", body: { value } }),
+
+  getProperties: () => apiFetcher<{ properties: ServerProperty[] }>(apiRoutes.admin.properties),
+  saveProperties: (changes: Record<string, string>, restart: boolean) =>
+    apiFetcher<{ saved: number; restarted: boolean }>(apiRoutes.admin.properties, {
+      method: "PUT",
+      body: { changes, restart },
+    }),
+
+  getBans: ({ signal }: WithSignal = {}) =>
+    apiFetcher<{ players: BannedPlayer[] }>(apiRoutes.admin.bans, { signal }),
 
   applyPlayerAction: (username: string, action: PlayerAction, body: PlayerReasonBody) =>
     apiFetcher<{ message: string }>(apiRoutes.admin.playerAction(username, action), {

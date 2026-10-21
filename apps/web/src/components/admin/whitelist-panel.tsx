@@ -8,7 +8,7 @@ import { Input } from "../ui/input";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
 
-export function WhitelistPanel() {
+export function WhitelistPanel({ className }: { className?: string }) {
   const [players, setPlayers] = useState<string[] | null>(null);
   const [username, setUsername] = useState("");
   const { pending, feedback, run } = useAction();
@@ -46,6 +46,7 @@ export function WhitelistPanel() {
   return (
     <Panel
       title={`Whitelista${players ? ` (${players.length})` : ""}`}
+      className={className}
       actions={
         <Button variant="ghost" size="sm" disabled={pending} onClick={() => void load()}>
           Odśwież

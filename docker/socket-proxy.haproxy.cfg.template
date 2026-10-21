@@ -47,9 +47,13 @@ backend docker-events
 frontend dockerfrontend
     bind ${BIND_CONFIG}
 
-    # Exact allow-list: inspect, start, stop and restart of the "minecraft" container, nothing else.
+    # Exact allow-list: inspect, read logs, read/write server.properties, start, stop and restart of the "minecraft" container, nothing else.
     # Matching the whole path (no regex) keeps this safe even if the container name has special characters.
     http-request allow if METH_GET { path,url_dec -m str /containers/minecraft/json }
+    http-request allow if METH_GET { path,url_dec -m str /containers/minecraft/logs }
+    # server.properties only: read that one file, write into /data (the tar the API sends holds just that file).
+    http-request allow if METH_GET { path,url_dec -m str /containers/minecraft/archive } { url_param(path),url_dec -m str /data/server.properties }
+    http-request allow if { method PUT } { path,url_dec -m str /containers/minecraft/archive } { url_param(path),url_dec -m str /data }
     http-request allow if { method POST } { path,url_dec -m str /containers/minecraft/start }
     http-request allow if { method POST } { path,url_dec -m str /containers/minecraft/stop }
     http-request allow if { method POST } { path,url_dec -m str /containers/minecraft/restart }
