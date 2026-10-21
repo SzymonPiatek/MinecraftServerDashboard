@@ -4,9 +4,13 @@ import type { AuditLogEntry } from "@mcd/shared";
 import { useCallback, useEffect, useState } from "react";
 import { useAction } from "@/hooks/use-action";
 import { adminActions } from "@/lib/api";
+import { cn } from "@/lib/cn";
 import { Button } from "../ui/button";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
+
+/** Shared by the header and the entries so the desktop columns line up. */
+const ROW = "py-2 md:grid md:grid-cols-[10rem_7rem_11rem_minmax(0,1fr)] md:gap-x-4";
 
 const formatDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "short", timeStyle: "medium" });
 
@@ -36,31 +40,29 @@ export function AuditPanel({ className }: { className?: string }) {
       <FeedbackLine feedback={feedback} />
       {entries?.length === 0 && <p className="text-ink-muted">Brak wpisów.</p>}
       {entries && entries.length > 0 && (
-        <div className="max-h-96 overflow-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 bg-paper">
-              <tr className="border-b-2 border-ink">
-                <th className="py-2 pr-4">Kiedy</th>
-                <th className="py-2 pr-4">Admin</th>
-                <th className="py-2 pr-4">Akcja</th>
-                <th className="py-2">Cel / szczegóły</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id} className="border-b border-line align-top">
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {formatDate.format(new Date(entry.createdAt))}
-                  </td>
-                  <td className="py-2 pr-4">{entry.admin}</td>
-                  <td className="py-2 pr-4 font-mono">{entry.action}</td>
-                  <td className="py-2 font-mono break-all">
-                    {[entry.target, entry.details].filter(Boolean).join(" · ")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="max-h-96 overflow-y-auto text-sm">
+          <div
+            className={cn(ROW, "sticky top-0 hidden border-b-2 border-ink bg-[#c6c6c6] font-bold md:grid")}
+          >
+            <span>Kiedy</span>
+            <span>Admin</span>
+            <span>Akcja</span>
+            <span>Cel / szczegóły</span>
+          </div>
+          <ul className="m-0 list-none p-0">
+            {entries.map((entry) => (
+              <li key={entry.id} className={cn(ROW, "flex flex-wrap gap-x-3 border-b border-line")}>
+                <span className="whitespace-nowrap text-ink-muted md:text-ink">
+                  {formatDate.format(new Date(entry.createdAt))}
+                </span>
+                <span>{entry.admin}</span>
+                <span className="font-mono">{entry.action}</span>
+                <span className="basis-full font-mono break-all md:basis-auto">
+                  {[entry.target, entry.details].filter(Boolean).join(" · ")}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </Panel>

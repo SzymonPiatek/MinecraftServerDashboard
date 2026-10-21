@@ -32,11 +32,12 @@ export function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: 
         </NavList>
       </FloatingNav>
       <main>
-        <Container className="grid items-start gap-6 pt-28 pb-8 md:grid-cols-2">
-          <ServerPanel />
-          <ConsolePanel />
-          <WhitelistPanel />
-          <PlayersPanel />
+        {/* Mobile: one column, status first. md+: console on the left spanning the three side panels. */}
+        <Container className="grid items-start gap-4 pt-24 pb-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-6 md:pt-28">
+          <ServerPanel className="md:col-start-2" />
+          <PlayersPanel className="md:col-start-2" />
+          <ConsolePanel className="md:col-start-1 md:row-span-3 md:row-start-1 md:self-stretch" />
+          <WhitelistPanel className="md:col-start-2" />
           <AuditPanel className="md:col-span-2" />
         </Container>
       </main>

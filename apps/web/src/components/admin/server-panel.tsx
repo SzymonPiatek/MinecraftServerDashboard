@@ -30,7 +30,7 @@ const CONFIRM: Partial<Record<ServerControlAction, string>> = {
 
 const POLL_MS = 10_000;
 
-export function ServerPanel() {
+export function ServerPanel({ className }: { className?: string }) {
   const [state, setState] = useState<ServiceState | null>(null);
   const { pending, feedback, run } = useAction();
 
@@ -56,6 +56,7 @@ export function ServerPanel() {
   return (
     <Panel
       title="Serwer"
+      className={className}
       actions={
         <Badge tone="muted">
           <Dot

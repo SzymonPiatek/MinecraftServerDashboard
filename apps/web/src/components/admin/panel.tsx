@@ -13,7 +13,7 @@ export function Panel({ title, actions, className, children, ...props }: PanelPr
       as="section"
       padding="none"
       elevated
-      className={cn("grid content-start gap-4 p-6", className)}
+      className={cn("grid content-start gap-4 p-4 md:p-6", className)}
       {...props}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
