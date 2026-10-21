@@ -11,6 +11,12 @@ export const playerReasonBodySchema = z.object({
 });
 export type PlayerReasonBody = z.infer<typeof playerReasonBodySchema>;
 
+export const bannedPlayerSchema = z.object({
+  name: z.string(),
+  reason: z.string(),
+});
+export type BannedPlayer = z.infer<typeof bannedPlayerSchema>;
+
 export const PLAYER_ACTIONS = ["kick", "ban", "pardon", "op", "deop"] as const;
 export const playerActionSchema = z.enum(PLAYER_ACTIONS);
 export type PlayerAction = z.infer<typeof playerActionSchema>;

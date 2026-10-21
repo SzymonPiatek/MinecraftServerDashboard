@@ -87,10 +87,10 @@ export function ConsolePanel({ className }: { className?: string }) {
   }
 
   return (
-    <Panel title="Konsola" className={cn("md:grid-rows-[auto_minmax(16rem,1fr)]", className)}>
+    <Panel title="Konsola" className={className}>
       <div
         ref={logRef}
-        className="h-64 overflow-y-auto rounded-input border-2 border-ink bg-ink p-3 font-mono text-sm text-paper md:h-auto"
+        className="h-64 overflow-y-auto rounded-input border-2 border-ink bg-ink p-3 font-mono text-sm text-paper md:h-96"
         role="log"
         aria-label="Wyniki komend"
       >

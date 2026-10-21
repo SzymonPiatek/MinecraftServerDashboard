@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { FloatingNav, NavBrand, NavList } from "../ui/nav-bar";
 import { Container } from "../ui/section";
 import { AuditPanel } from "./audit-panel";
+import { BansPanel } from "./bans-panel";
 import { ConsolePanel } from "./console-panel";
 import { PlayersPanel } from "./players-panel";
 import { ServerPanel } from "./server-panel";
@@ -32,13 +33,17 @@ export function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: 
         </NavList>
       </FloatingNav>
       <main>
-        {/* Mobile: one column, status first. md+: console on the left spanning the three side panels. */}
-        <Container className="grid items-start gap-4 pt-24 pb-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-6 md:pt-28">
-          <ServerPanel className="md:col-start-2" />
-          <PlayersPanel className="md:col-start-2" />
-          <ConsolePanel className="md:col-start-1 md:row-span-3 md:row-start-1 md:self-stretch" />
-          <WhitelistPanel className="md:col-start-2" />
-          <AuditPanel className="md:col-span-2" />
+        {/* Status, console and log span the page; the lists share a two-column grid of equal-height tiles
+            that scroll internally, so long lists never push the full-width panels around. */}
+        <Container className="grid gap-4 pt-24 pb-8 md:gap-6 md:pt-28">
+          <ServerPanel />
+          <ConsolePanel />
+          <div className="grid gap-4 md:grid-cols-2 md:gap-6">
+            <PlayersPanel />
+            <WhitelistPanel />
+            <BansPanel className="md:col-span-2" />
+          </div>
+          <AuditPanel />
         </Container>
       </main>
     </>

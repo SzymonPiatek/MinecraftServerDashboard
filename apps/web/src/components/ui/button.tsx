@@ -51,15 +51,28 @@ export const buttonVariants = cva(
   },
 );
 
-export type ButtonProps = ComponentProps<"button"> & VariantProps<typeof buttonVariants>;
+export type ButtonProps = ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    /** Classes for the outer <button>; `className` styles the visible face inside it. */
+    wrapperClassName?: string;
+  };
 
-export function Button({ variant, size, className, type = "button", children, ...props }: ButtonProps) {
+export function Button({
+  variant,
+  size,
+  className,
+  wrapperClassName,
+  type = "button",
+  children,
+  ...props
+}: ButtonProps) {
   return (
     <button
       type={type}
       className={cn(
         "group/btn inline-flex max-w-full cursor-pointer disabled:cursor-progress",
         variant === "ghost" ? "rounded-pill disabled:opacity-70" : "rounded-none",
+        wrapperClassName,
       )}
       {...props}
     >

@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
 
-/** Shared by the header and the entries so the desktop columns line up. */
+/** Shared by the header and the entries so the desktop columns line up (the log is always full width). */
 const ROW = "py-2 md:grid md:grid-cols-[10rem_7rem_11rem_minmax(0,1fr)] md:gap-x-4";
 
 const formatDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "short", timeStyle: "medium" });
@@ -57,7 +57,7 @@ export function AuditPanel({ className }: { className?: string }) {
                 </span>
                 <span>{entry.admin}</span>
                 <span className="font-mono">{entry.action}</span>
-                <span className="basis-full font-mono break-all md:basis-auto">
+                <span className="basis-full font-mono break-words md:basis-auto">
                   {[entry.target, entry.details].filter(Boolean).join(" · ")}
                 </span>
               </li>

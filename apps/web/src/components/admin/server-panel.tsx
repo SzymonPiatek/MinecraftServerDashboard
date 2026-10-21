@@ -68,12 +68,14 @@ export function ServerPanel({ className }: { className?: string }) {
         </Badge>
       }
     >
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {SERVER_CONTROL_ACTIONS.map((action) => (
           <Button
             key={action}
             variant={action === "start" ? "primary" : "secondary"}
             size="sm"
+            wrapperClassName="w-full"
+            className="w-full"
             disabled={pending}
             onClick={() => void control(action)}
           >

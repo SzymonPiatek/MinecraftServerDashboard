@@ -2,6 +2,7 @@ import { parseEnv } from "../src/config/env.js";
 import type { Container } from "../src/container.js";
 import type { ContactBody } from "@mcd/shared";
 import { createPlayersService } from "../src/modules/admin/players.service.js";
+import { createBansService } from "../src/modules/admin/bans.service.js";
 import { createWhitelistService } from "../src/modules/admin/whitelist.service.js";
 import type { AuditEvent } from "../src/modules/audit/audit.service.js";
 import type { AdminRecord } from "../src/modules/auth/admin.repository.js";
@@ -65,6 +66,7 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
     rcon,
     whitelist: createWhitelistService(rcon),
     players: createPlayersService(rcon),
+    bans: createBansService(rcon),
     serverControl: {
       getState: async () => "active",
       control: async (action) => void serverActions.push(action),

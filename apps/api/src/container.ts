@@ -1,5 +1,6 @@
 import type { Env } from "./config/env.js";
 import { createPrismaClient } from "./db/prisma.js";
+import { createBansService, type BansService } from "./modules/admin/bans.service.js";
 import { createPlayersService, type PlayersService } from "./modules/admin/players.service.js";
 import { createWhitelistService, type WhitelistService } from "./modules/admin/whitelist.service.js";
 import { createAuditService, type AuditService } from "./modules/audit/audit.service.js";
@@ -25,6 +26,7 @@ export interface Container {
   rcon: RconClient;
   whitelist: WhitelistService;
   players: PlayersService;
+  bans: BansService;
   serverControl: ServerControlService;
   close(): Promise<void>;
 }
@@ -62,6 +64,7 @@ export function createContainer(env: Env): Container {
     rcon,
     whitelist: createWhitelistService(rcon),
     players: createPlayersService(rcon),
+    bans: createBansService(rcon),
     serverControl: createDockerService({ apiUrl: env.DOCKER_API_URL, containerName: env.MC_CONTAINER_NAME }),
     close: () => prisma.$disconnect(),
   };

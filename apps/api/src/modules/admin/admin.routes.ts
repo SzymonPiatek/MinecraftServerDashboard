@@ -16,6 +16,7 @@ import type { AuditService } from "../audit/audit.service.js";
 import { currentAdmin } from "../auth/require-admin.js";
 import type { RconClient } from "../minecraft/rcon.client.js";
 import type { ServerControlService } from "../server-control/docker.service.js";
+import type { BansService } from "./bans.service.js";
 import type { PlayersService } from "./players.service.js";
 import type { WhitelistService } from "./whitelist.service.js";
 
@@ -23,6 +24,7 @@ interface AdminRoutesOptions {
   requireAdmin: RequestHandler;
   whitelist: WhitelistService;
   players: PlayersService;
+  bans: BansService;
   rcon: RconClient;
   serverControl: ServerControlService;
   audit: AuditService;
@@ -31,7 +33,7 @@ interface AdminRoutesOptions {
 const auditLimitSchema = z.coerce.number().int().min(1).max(200).default(50);
 
 export function createAdminRoutes(deps: AdminRoutesOptions): Router {
-  const { requireAdmin, whitelist, players, rcon, serverControl, audit } = deps;
+  const { requireAdmin, whitelist, players, bans, rcon, serverControl, audit } = deps;
   const router = Router();
   router.use(requireAdmin);
 
@@ -52,6 +54,11 @@ export function createAdminRoutes(deps: AdminRoutesOptions): Router {
     await whitelist.remove(username);
     await audit.record({ adminId: currentAdmin(req).id, action: "whitelist.remove", target: username });
     res.status(204).end();
+  });
+
+  // --- Bans ---
+  router.get("/bans", async (_req, res) => {
+    res.json({ players: await bans.list() });
   });
 
   // --- Player management (kick, ban, pardon, op, deop) ---

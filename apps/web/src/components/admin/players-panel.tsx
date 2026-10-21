@@ -24,7 +24,7 @@ export function PlayersPanel({ className }: { className?: string }) {
     <Panel title={`Gracze online${online ? ` (${online.online}/${online.max})` : ""}`} className={className}>
       {!online && <p className="text-ink-muted">Sprawdzam…</p>}
       {online?.players.length === 0 && <p className="text-ink-muted">Nikogo nie ma na serwerze.</p>}
-      <ul className="m-0 grid max-h-64 list-none gap-2 overflow-y-auto p-0">
+      <ul className="m-0 grid max-h-48 list-none gap-2 overflow-y-auto p-0">
         {online?.players.map((name) => (
           <li key={name} className="rounded-input border-[1.5px] border-line bg-paper px-4 py-1 font-mono">
             {name}

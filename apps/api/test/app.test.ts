@@ -13,7 +13,10 @@ async function loginAsAdmin() {
 }
 
 beforeEach(async () => {
-  harness = await createTestContainer({ "whitelist list": "There are 2 whitelisted player(s): Alex, Steve" });
+  harness = await createTestContainer({
+    "whitelist list": "There are 2 whitelisted player(s): Alex, Steve",
+    "banlist players": "There are 1 ban(s):\nSteve was banned by Rcon: griefing",
+  });
   agent = request.agent(createApp(harness.container));
 });
 
@@ -63,6 +66,14 @@ describe("authentication", () => {
 
   it("validates the login body", async () => {
     await agent.post("/api/auth/login").send({}).expect(400);
+  });
+});
+
+describe("admin bans", () => {
+  it("lists banned players", async () => {
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/bans").expect(200);
+    expect(res.body.players).toEqual([{ name: "Steve", reason: "griefing" }]);
   });
 });
 
