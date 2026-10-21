@@ -124,6 +124,37 @@
     border-radius: 6px;
   }
 
+  /* Minecraft scrollbar: a 1px bevel sprite as `border-image`, a flat body and a small grip in the middle (WebKit/Blink only). */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+    background: #000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    min-height: 24px;
+    min-width: 24px;
+    border: 1px solid;
+    border-image: url(/scroller.png) 1 / 1 / 0 stretch;
+    background-color: #c6c6c6;
+    background-image: repeating-linear-gradient(to bottom, #8b8b8b 0 1px, transparent 1px 2px);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 6px 5px;
+    image-rendering: pixelated;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #000;
+  }
+
+  /* Browsers without ::-webkit-scrollbar (Firefox) can only be recoloured. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-color: #8b8b8b #000;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
