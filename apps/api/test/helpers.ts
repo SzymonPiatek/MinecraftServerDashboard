@@ -2,6 +2,7 @@ import { parseEnv } from "../src/config/env.js";
 import type { Container } from "../src/container.js";
 import type { ContactBody } from "@mcd/shared";
 import { createPlayersService } from "../src/modules/admin/players.service.js";
+import { createGamerulesService } from "../src/modules/admin/gamerules.service.js";
 import { createBansService } from "../src/modules/admin/bans.service.js";
 import { createWhitelistService } from "../src/modules/admin/whitelist.service.js";
 import type { AuditEvent } from "../src/modules/audit/audit.service.js";
@@ -37,6 +38,8 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
       rconCommands.push(command);
       return rconReplies[command] ?? "";
     },
+    executeMany: async (commands: string[]) =>
+      commands.map((command) => (rconCommands.push(command), rconReplies[command] ?? "")),
   };
 
   const auditEvents: AuditEvent[] = [];
@@ -67,6 +70,7 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
     whitelist: createWhitelistService(rcon),
     players: createPlayersService(rcon),
     bans: createBansService(rcon),
+    gamerules: createGamerulesService(rcon),
     serverControl: {
       getState: async () => "active",
       control: async (action) => void serverActions.push(action),

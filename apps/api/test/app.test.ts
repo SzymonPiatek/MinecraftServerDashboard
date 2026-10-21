@@ -15,6 +15,12 @@ async function loginAsAdmin() {
 beforeEach(async () => {
   harness = await createTestContainer({
     "whitelist list": "There are 2 whitelisted player(s): Alex, Steve",
+    "help gamerule":
+      "/gamerule keep_inventory [<value>]/gamerule minecraft:keep_inventory [<value>]/gamerule brand_new_rule [<value>]",
+    "gamerule keep_inventory": "Gamerule keep_inventory is currently set to: true",
+    "gamerule brand_new_rule": "Gamerule brand_new_rule is currently set to: 7",
+    "gamerule keep_inventory false": "Gamerule keep_inventory is now set to: false",
+    "gamerule keep_inventory 5": "Incorrect argument for command",
     "banlist players": "There are 1 ban(s):\nSteve was banned by Rcon: griefing",
   });
   agent = request.agent(createApp(harness.container));
@@ -84,6 +90,41 @@ describe("admin logs", () => {
     const res = await agent.get("/api/admin/logs").expect(200);
     expect(res.body.lines).toHaveLength(1);
     await agent.get("/api/admin/logs").query({ after: "yesterday" }).expect(400);
+  });
+});
+
+describe("admin gamerules", () => {
+  it("lists the rules the server answers for, including ones it reports itself", async () => {
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/gamerules").expect(200);
+    expect(res.body.rules).toEqual([
+      { name: "brand_new_rule", value: 7 },
+      { name: "keep_inventory", value: true },
+    ]);
+  });
+
+  it("sets a rule and audits it", async () => {
+    await loginAsAdmin();
+    await agent.put("/api/admin/gamerules/keep_inventory").send({ value: false }).expect(200);
+    expect(harness.rconCommands).toContain("gamerule keep_inventory false");
+    expect(harness.auditEvents.at(-1)).toMatchObject({
+      action: "gamerule.set",
+      target: "keep_inventory",
+      details: "false",
+    });
+  });
+
+  it("rejects values the server refuses and names that could inject commands", async () => {
+    await loginAsAdmin();
+    await agent.put("/api/admin/gamerules/keep_inventory").send({ value: 5 }).expect(400);
+    await agent.put("/api/admin/gamerules/keep_inventory").send({ value: "x" }).expect(400);
+    await agent.put("/api/admin/gamerules/a%20b").send({ value: true }).expect(400);
+    await agent.put("/api/admin/gamerules/Keep_Inventory").send({ value: true }).expect(400);
+    expect(harness.rconCommands).not.toContain("gamerule a b true");
+  });
+
+  it("requires a session", async () => {
+    await agent.get("/api/admin/gamerules").expect(401);
   });
 });
 

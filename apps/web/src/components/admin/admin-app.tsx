@@ -3,9 +3,12 @@
 import { useAdminSession } from "@/hooks/use-admin-session";
 import { Dashboard } from "./dashboard";
 import { LoginForm } from "./login-form";
+import { GamerulesView } from "./gamerules-view";
 import { LogsView } from "./logs-view";
 
-export function AdminApp({ view = "dashboard" }: { view?: "dashboard" | "logs" }) {
+const VIEWS = { dashboard: Dashboard, logs: LogsView, gamerules: GamerulesView };
+
+export function AdminApp({ view = "dashboard" }: { view?: keyof typeof VIEWS }) {
   const { session, signIn, signOut } = useAdminSession();
 
   if (session.phase === "loading") {
@@ -20,6 +23,6 @@ export function AdminApp({ view = "dashboard" }: { view?: "dashboard" | "logs" }
   if (session.phase === "anonymous") {
     return <LoginForm onLogin={signIn} />;
   }
-  const View = view === "logs" ? LogsView : Dashboard;
+  const View = VIEWS[view];
   return <View onLogout={signOut} />;
 }

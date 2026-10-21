@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useId, useMemo, useRef, useState, type KeyboardEvent, type SubmitEvent } from "react";
 import { useAction } from "@/hooks/use-action";
 import { usePolling } from "@/hooks/use-polling";
@@ -30,7 +29,6 @@ export function ConsolePanel({ className }: { className?: string }) {
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
-  const router = useRouter();
 
   // Nick suggestions are best-effort, so a failed fetch just leaves the list as it was.
   usePolling(async (signal) => {
@@ -89,15 +87,7 @@ export function ConsolePanel({ className }: { className?: string }) {
   }
 
   return (
-    <Panel
-      title="Konsola"
-      className={className}
-      actions={
-        <Button variant="secondary" size="sm" onClick={() => router.push("/admin/logs")}>
-          Logi serwera
-        </Button>
-      }
-    >
+    <Panel title="Konsola" className={className}>
       <div
         ref={logRef}
         className="h-64 overflow-y-auto rounded-input border-2 border-ink bg-ink p-3 font-mono text-sm text-paper md:h-96"

@@ -1,5 +1,8 @@
 import {
   consoleCommandBodySchema,
+  gameruleBodySchema,
+  gameruleNameSchema,
+  type GameruleBody,
   playerActionSchema,
   playerReasonBodySchema,
   serverControlActionSchema,
@@ -17,6 +20,7 @@ import { currentAdmin } from "../auth/require-admin.js";
 import type { RconClient } from "../minecraft/rcon.client.js";
 import type { ServerControlService } from "../server-control/docker.service.js";
 import type { BansService } from "./bans.service.js";
+import type { GamerulesService } from "./gamerules.service.js";
 import type { PlayersService } from "./players.service.js";
 import type { WhitelistService } from "./whitelist.service.js";
 
@@ -25,6 +29,7 @@ interface AdminRoutesOptions {
   whitelist: WhitelistService;
   players: PlayersService;
   bans: BansService;
+  gamerules: GamerulesService;
   rcon: RconClient;
   serverControl: ServerControlService;
   audit: AuditService;
@@ -34,7 +39,7 @@ const logsAfterSchema = z.iso.datetime().optional();
 const auditLimitSchema = z.coerce.number().int().min(1).max(200).default(50);
 
 export function createAdminRoutes(deps: AdminRoutesOptions): Router {
-  const { requireAdmin, whitelist, players, bans, rcon, serverControl, audit } = deps;
+  const { requireAdmin, whitelist, players, bans, gamerules, rcon, serverControl, audit } = deps;
   const router = Router();
   router.use(requireAdmin);
 
@@ -60,6 +65,24 @@ export function createAdminRoutes(deps: AdminRoutesOptions): Router {
   // --- Bans ---
   router.get("/bans", async (_req, res) => {
     res.json({ players: await bans.list() });
+  });
+
+  // --- Gamerules ---
+  router.get("/gamerules", async (_req, res) => {
+    res.json({ rules: await gamerules.list() });
+  });
+
+  router.put("/gamerules/:name", validateBody(gameruleBodySchema), async (req, res) => {
+    const name = parseParam(gameruleNameSchema, req.params.name);
+    const { value } = req.body as GameruleBody;
+    await gamerules.set(name, value);
+    await audit.record({
+      adminId: currentAdmin(req).id,
+      action: "gamerule.set",
+      target: name,
+      details: String(value),
+    });
+    res.json({ name, value });
   });
 
   // --- Player management (kick, ban, pardon, op, deop) ---

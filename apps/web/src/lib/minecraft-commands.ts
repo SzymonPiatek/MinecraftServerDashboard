@@ -1,3 +1,5 @@
+import { GAMERULE_NAMES } from "@mcd/shared";
+
 /** One argument slot: a fixed list of values, or `"player"` for a nick (online players are offered). */
 type ArgHint = readonly string[] | "player";
 
@@ -107,21 +109,7 @@ export const MC_COMMANDS: readonly McCommand[] = [
     name: "gamerule",
     usage: "gamerule <reguła> [wartość]",
     description: "reguły gry",
-    args: [
-      [
-        "doDaylightCycle",
-        "doFireTick",
-        "doMobSpawning",
-        "doWeatherCycle",
-        "keepInventory",
-        "mobGriefing",
-        "naturalRegeneration",
-        "playersSleepingPercentage",
-        "randomTickSpeed",
-        "showDeathMessages",
-      ],
-      ["true", "false"],
-    ],
+    args: [GAMERULE_NAMES, ["true", "false"]],
   },
   {
     name: "give",

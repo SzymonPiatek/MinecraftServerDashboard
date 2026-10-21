@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { cacheAsync } from "../src/lib/ttl-cache.js";
+import { parseGamerule, parseRuleNames } from "../src/modules/admin/gamerules.service.js";
 import { parseBanlist } from "../src/modules/admin/bans.service.js";
 import { parseWhitelist } from "../src/modules/admin/whitelist.service.js";
 
@@ -27,6 +28,27 @@ describe("parseBanlist", () => {
 
   it("returns an empty list when nobody is banned", () => {
     expect(parseBanlist("There are no bans")).toEqual([]);
+  });
+});
+
+describe("parseGamerule", () => {
+  it("reads booleans and integers", () => {
+    expect(parseGamerule("Gamerule keep_inventory is currently set to: true")).toBe(true);
+    expect(parseGamerule("Gamerule pvp is currently set to: false")).toBe(false);
+    expect(parseGamerule("Gamerule max_entity_cramming is currently set to: 24")).toBe(24);
+  });
+
+  it("returns null for rules the server does not know", () => {
+    expect(parseGamerule("Incorrect argument for commandgamerule keepInventory<--[HERE]")).toBeNull();
+    expect(parseGamerule("")).toBeNull();
+  });
+});
+
+describe("parseRuleNames", () => {
+  it("keeps the plain names and drops the minecraft: twins and the truncated tail", () => {
+    const help =
+      "/gamerule keep_inventory [<value>]/gamerule minecraft:keep_inventory [<value>]/gamerule spawn_phantoms [<value>]/gamerule mi";
+    expect(parseRuleNames(help)).toEqual(["keep_inventory", "spawn_phantoms"]);
   });
 });
 

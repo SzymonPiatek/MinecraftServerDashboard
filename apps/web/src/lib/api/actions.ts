@@ -2,6 +2,7 @@ import type {
   AdminSession,
   AuditLogEntry,
   BannedPlayer,
+  Gamerule,
   LogLine,
   ContactBody,
   LoginBody,
@@ -51,6 +52,10 @@ export const adminActions = {
 
   getLogs: (after?: string, { signal }: WithSignal = {}) =>
     apiFetcher<{ lines: LogLine[] }>(apiRoutes.admin.logs, { query: { after }, signal }),
+
+  getGamerules: () => apiFetcher<{ rules: Gamerule[] }>(apiRoutes.admin.gamerules),
+  setGamerule: (name: string, value: boolean | number) =>
+    apiFetcher<Gamerule>(apiRoutes.admin.gamerule(name), { method: "PUT", body: { value } }),
 
   getBans: ({ signal }: WithSignal = {}) =>
     apiFetcher<{ players: BannedPlayer[] }>(apiRoutes.admin.bans, { signal }),

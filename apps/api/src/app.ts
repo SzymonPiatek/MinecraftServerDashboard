@@ -54,6 +54,7 @@ export function createApp(container: Container): Express {
       whitelist: container.whitelist,
       players: container.players,
       bans: container.bans,
+      gamerules: container.gamerules,
       rcon: container.rcon,
       serverControl: container.serverControl,
       audit: container.audit,
