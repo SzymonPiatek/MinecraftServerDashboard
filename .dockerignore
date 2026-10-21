@@ -2,6 +2,11 @@
 .idea
 .github
 extra
+deploy
+docker
+**/*.md
+**/*.tsbuildinfo
+**/test
 node_modules
 **/node_modules
 **/dist
