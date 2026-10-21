@@ -1,8 +1,24 @@
 name: Build & Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
+    # Skip docs/tooling-only pushes. Compose, Caddy and deploy script changes still deploy (the VPS pulls them via git).
+    paths:
+      - apps/**
+      - packages/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - .pnpmfile.cjs
+      - tsconfig.base.json
+      - .dockerignore
+      - docker-compose.yml
+      - Caddyfile
+      - deploy/**
+      - docker/**
+      - .github/workflows/deploy.yml
 
 permissions:
   contents: read
