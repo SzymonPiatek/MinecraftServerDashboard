@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans, VT323 } from "next/font/google";
+import { PageBackground } from "@/components/page-background";
 import { ToastProvider } from "@/components/ui/toast";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pl" className={`${jakarta.variable} ${jetbrains.variable} ${vt323.variable}`}>
       <body>
+        <PageBackground />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

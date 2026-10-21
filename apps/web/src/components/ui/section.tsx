@@ -20,7 +20,7 @@ export function SectionHead({ title, description, className, ...props }: Section
   return (
     <div className={cn("mb-10 grid max-w-160 gap-2", className)} {...props}>
       <h2 className="text-3xl">{title}</h2>
-      {description && <p className="text-lg text-ink-muted">{description}</p>}
+      {description && <p className="text-lg text-paper/85 [&_a]:text-accent">{description}</p>}
     </div>
   );
 }

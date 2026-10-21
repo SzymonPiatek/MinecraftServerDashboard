@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 export const cardVariants = cva(
   [
     "rounded-none",
+    "text-ink",
     "border-6",
     "border-solid",
     "bg-clip-padding",

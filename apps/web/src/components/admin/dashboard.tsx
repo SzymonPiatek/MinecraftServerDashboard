@@ -14,7 +14,7 @@ import { WhitelistPanel } from "./whitelist-panel";
 export function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => void }) {
   return (
     <>
-      <header className="border-b-2 border-ink bg-paper-2">
+      <header className="border-b-2 border-ink bg-paper-2 text-ink">
         <Container className="flex flex-wrap items-center justify-between gap-4 py-4">
           <div>
             <h1 className="text-lg">Panel admina · {siteConfig.name}</h1>

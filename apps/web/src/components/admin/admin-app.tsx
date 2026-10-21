@@ -10,7 +10,7 @@ export function AdminApp() {
   if (session.phase === "loading") {
     return (
       <main className="grid min-h-dvh place-items-center">
-        <p role="status" className="text-ink-muted">
+        <p role="status" className="text-paper/85">
           Ładowanie…
         </p>
       </main>
