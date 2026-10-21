@@ -70,6 +70,9 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
     serverControl: {
       getState: async () => "active",
       control: async (action) => void serverActions.push(action),
+      getLogs: async () => [
+        { time: "2026-10-21T10:00:00.5Z", text: "[10:00:00] [Server thread/INFO]: Done" },
+      ],
     },
     close: async () => {},
   };

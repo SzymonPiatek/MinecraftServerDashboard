@@ -30,6 +30,7 @@ interface AdminRoutesOptions {
   audit: AuditService;
 }
 
+const logsAfterSchema = z.iso.datetime().optional();
 const auditLimitSchema = z.coerce.number().int().min(1).max(200).default(50);
 
 export function createAdminRoutes(deps: AdminRoutesOptions): Router {
@@ -88,6 +89,11 @@ export function createAdminRoutes(deps: AdminRoutesOptions): Router {
   // --- Server process ---
   router.get("/server", async (_req, res) => {
     res.json({ state: await serverControl.getState() });
+  });
+
+  router.get("/logs", async (req, res) => {
+    const after = parseParam(logsAfterSchema, req.query.after);
+    res.json({ lines: await serverControl.getLogs(after) });
   });
 
   router.post("/server/:action", async (req, res) => {

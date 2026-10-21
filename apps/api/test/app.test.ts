@@ -77,6 +77,16 @@ describe("admin bans", () => {
   });
 });
 
+describe("admin logs", () => {
+  it("requires a session and validates the cursor", async () => {
+    await agent.get("/api/admin/logs").expect(401);
+    await loginAsAdmin();
+    const res = await agent.get("/api/admin/logs").expect(200);
+    expect(res.body.lines).toHaveLength(1);
+    await agent.get("/api/admin/logs").query({ after: "yesterday" }).expect(400);
+  });
+});
+
 describe("admin whitelist", () => {
   it("lists, adds and removes players, auditing mutations", async () => {
     await loginAsAdmin();

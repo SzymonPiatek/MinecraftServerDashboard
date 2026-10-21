@@ -17,6 +17,13 @@ export const bannedPlayerSchema = z.object({
 });
 export type BannedPlayer = z.infer<typeof bannedPlayerSchema>;
 
+export const logLineSchema = z.object({
+  /** RFC 3339 timestamp from Docker, used as the cursor for the next poll. */
+  time: z.string(),
+  text: z.string(),
+});
+export type LogLine = z.infer<typeof logLineSchema>;
+
 export const PLAYER_ACTIONS = ["kick", "ban", "pardon", "op", "deop"] as const;
 export const playerActionSchema = z.enum(PLAYER_ACTIONS);
 export type PlayerAction = z.infer<typeof playerActionSchema>;

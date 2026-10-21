@@ -18,6 +18,7 @@ export const apiRoutes = {
     whitelist: "/admin/whitelist",
     whitelistEntry: (username: string) => `/admin/whitelist/${enc(username)}`,
     bans: "/admin/bans",
+    logs: "/admin/logs",
     playerAction: (username: string, action: PlayerAction) => `/admin/players/${enc(username)}/${action}`,
     console: "/admin/console",
     server: "/admin/server",

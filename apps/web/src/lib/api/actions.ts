@@ -2,6 +2,7 @@ import type {
   AdminSession,
   AuditLogEntry,
   BannedPlayer,
+  LogLine,
   ContactBody,
   LoginBody,
   OnlinePlayers,
@@ -47,6 +48,9 @@ export const adminActions = {
     apiFetcher(apiRoutes.admin.whitelist, { method: "POST", body: { username } }),
   removeFromWhitelist: (username: string) =>
     apiFetcher(apiRoutes.admin.whitelistEntry(username), { method: "DELETE" }),
+
+  getLogs: (after?: string, { signal }: WithSignal = {}) =>
+    apiFetcher<{ lines: LogLine[] }>(apiRoutes.admin.logs, { query: { after }, signal }),
 
   getBans: ({ signal }: WithSignal = {}) =>
     apiFetcher<{ players: BannedPlayer[] }>(apiRoutes.admin.bans, { signal }),

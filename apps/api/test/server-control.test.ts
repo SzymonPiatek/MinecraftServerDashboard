@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createDockerService } from "../src/modules/server-control/docker.service.js";
+import { createDockerService, parseLogStream } from "../src/modules/server-control/docker.service.js";
 
 function serviceWith(respond: (url: string, init?: RequestInit) => Response | Promise<Response>) {
   const fetchMock = vi.fn(async (url: string | URL | Request, init?: RequestInit) =>
@@ -75,5 +75,53 @@ describe("docker server control: actions", () => {
       throw new Error("connect ECONNREFUSED");
     }).service;
     await expect(down.control("stop")).rejects.toMatchObject({ status: 503 });
+  });
+});
+
+/** Builds one Docker multiplexed frame (stream type 1 = stdout). */
+const frame = (payload: string) => {
+  const body = Buffer.from(payload);
+  const header = Buffer.alloc(8);
+  header[0] = 1;
+  header.writeUInt32BE(body.length, 4);
+  return Buffer.concat([header, body]);
+};
+
+describe("docker server control: logs", () => {
+  it("demultiplexes frames into timestamped lines and strips colour codes", () => {
+    const stream = Buffer.concat([
+      frame("2026-10-21T10:00:00.123456789Z [Server thread/INFO]: Done\n"),
+      frame("2026-10-21T10:00:01.5Z \x1b[31m[Server thread/WARN]: Careful\x1b[0m\n"),
+    ]);
+    expect(parseLogStream(stream)).toEqual([
+      { time: "2026-10-21T10:00:00.123456789Z", text: "[Server thread/INFO]: Done" },
+      { time: "2026-10-21T10:00:01.5Z", text: "[Server thread/WARN]: Careful" },
+    ]);
+  });
+
+  it("reads plain text from a container with a TTY", () => {
+    expect(parseLogStream(Buffer.from("2026-10-21T10:00:00Z hello\n"))).toEqual([
+      { time: "2026-10-21T10:00:00Z", text: "hello" },
+    ]);
+  });
+
+  it("asks for the tail first, then only for lines after the cursor", async () => {
+    const stream = Buffer.concat([
+      frame("2026-10-21T10:00:00.5Z old\n"),
+      frame("2026-10-21T10:00:00.75Z new\n"),
+    ]);
+    const { service, fetchMock } = serviceWith(() => new Response(stream));
+
+    expect((await service.getLogs()).map((l) => l.text)).toEqual(["old", "new"]);
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain("tail=300");
+
+    const next = await service.getLogs("2026-10-21T10:00:00.5Z");
+    expect(next.map((l) => l.text)).toEqual(["new"]);
+    expect(String(fetchMock.mock.calls[1]?.[0])).toContain("since=1792576800");
+  });
+
+  it("turns Docker failures into 503", async () => {
+    const { service } = serviceWith(() => new Response("no", { status: 403 }));
+    await expect(service.getLogs()).rejects.toMatchObject({ status: 503 });
   });
 });
