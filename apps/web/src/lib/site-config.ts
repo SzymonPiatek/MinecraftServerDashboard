@@ -4,6 +4,7 @@ export const siteConfig = {
   description: "Wspólny serwer Minecraft. Wbijaj, buduj, eksploruj.",
   address: "spiatek.pl",
   minecraftEdition: "Java Edition",
+  mapUrl: "https://map.spiatek.pl",
   steps: [
     {
       title: "Odpal Grę",

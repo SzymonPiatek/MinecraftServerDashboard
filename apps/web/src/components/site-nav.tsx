@@ -4,6 +4,7 @@ import { FloatingNav, NavBrand, NavList } from "./ui/nav-bar";
 
 const links = [
   { href: "#status", label: "Status" },
+  ...(siteConfig.mapUrl ? [{ href: "#mapa", label: "Mapa" }] : []),
   { href: "#join", label: "Jak dołączyć" },
   { href: "#faq", label: "FAQ" },
   { href: "#kontakt", label: "Kontakt" },

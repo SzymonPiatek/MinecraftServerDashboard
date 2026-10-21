@@ -24,6 +24,22 @@ services:
       - "25565:25565" # game traffic only; RCON and Query stay on the internal network
     networks: [internal]
 
+  # Renders the world into a browsable 3D map (BlueMap CLI, works with a vanilla server) and keeps it updated as the
+  # world changes. Reads the world read-only; Caddy serves the built-in web server on the map subdomain.
+  bluemap:
+    image: ghcr.io/bluemap-minecraft/bluemap:v5.29
+    command: ["-r", "-u", "-w"]
+    restart: unless-stopped
+    mem_limit: 1g
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx768m
+    volumes:
+      - ./bluemap/config:/app/config:ro
+      - ${MC_DATA_DIR:-/home/ubuntu/server}/world:/app/world:ro
+      - bluemap-data:/app/data
+      - bluemap-web:/app/web
+    networks: [internal]
+
   # Lets the API inspect/start/stop/restart the minecraft container (and nothing else) without the raw Docker socket.
   docker-proxy:
     image: tecnativa/docker-socket-proxy:latest
@@ -91,7 +107,7 @@ services:
   caddy:
     image: caddy:2
     restart: unless-stopped
-    depends_on: [api, web]
+    depends_on: [api, web, bluemap]
     ports:
       - "80:80"
       - "443:443"
@@ -110,5 +126,7 @@ networks:
 
 volumes:
   api-data:
+  bluemap-data:
+  bluemap-web:
   caddy-data:
   caddy-config:

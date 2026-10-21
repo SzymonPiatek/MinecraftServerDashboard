@@ -2,6 +2,7 @@ import { ContactSection } from "@/components/contact-section";
 import { FaqSection } from "@/components/faq-section";
 import { Hero } from "@/components/hero";
 import { JoinSection } from "@/components/join-section";
+import { MapSection } from "@/components/map-section";
 import { ServerDataProvider } from "@/components/server-data";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
@@ -14,6 +15,7 @@ export default function HomePage() {
       <main>
         <Hero />
         <StatusSection />
+        <MapSection />
         <JoinSection />
         <FaqSection />
         <ContactSection />

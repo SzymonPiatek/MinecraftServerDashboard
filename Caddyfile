@@ -16,3 +16,15 @@ mc.spiatek.pl {
 		reverse_proxy web:3000
 	}
 }
+
+map.spiatek.pl {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+
+	reverse_proxy bluemap:8100
+}
