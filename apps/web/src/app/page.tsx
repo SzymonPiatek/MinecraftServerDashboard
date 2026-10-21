@@ -1,3 +1,4 @@
+import { ContactSection } from "@/components/contact-section";
 import { FaqSection } from "@/components/faq-section";
 import { Hero } from "@/components/hero";
 import { JoinSection } from "@/components/join-section";
@@ -15,6 +16,7 @@ export default function HomePage() {
         <StatusSection />
         <JoinSection />
         <FaqSection />
+        <ContactSection />
       </main>
       <SiteFooter />
     </ServerDataProvider>

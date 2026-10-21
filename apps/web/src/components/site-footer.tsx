@@ -7,7 +7,9 @@ export function SiteFooter() {
       <div className={`container ${styles.inner}`}>
         <p className={styles.wordmark}>{siteConfig.name}</p>
         <div className={styles.meta}>
-          <p>{siteConfig.contact}</p>
+          <p>
+            {siteConfig.contact} <a href="#kontakt">Przejdź do formularza</a>.
+          </p>
           <p className={styles.small}>
             Serwer niezwiązany z Mojang Studios ani Microsoft. Minecraft jest znakiem towarowym Mojang AB.
           </p>

@@ -1,5 +1,6 @@
 import { parseEnv } from "../src/config/env.js";
 import type { Container } from "../src/container.js";
+import type { ContactBody } from "@mcd/shared";
 import { createPlayersService } from "../src/modules/admin/players.service.js";
 import { createWhitelistService } from "../src/modules/admin/whitelist.service.js";
 import type { AuditEvent } from "../src/modules/audit/audit.service.js";
@@ -39,6 +40,7 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
 
   const auditEvents: AuditEvent[] = [];
   const serverActions: string[] = [];
+  const contactMessages: ContactBody[] = [];
 
   const container: Container = {
     env,
@@ -48,6 +50,7 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
       record: async (event) => void auditEvents.push(event),
       list: async () => [],
     },
+    contact: { send: async (message) => void contactMessages.push(message) },
     minecraft: {
       getStatus: async () => ({
         online: true,
@@ -69,5 +72,5 @@ export async function createTestContainer(rconReplies: Record<string, string> = 
     close: async () => {},
   };
 
-  return { container, rconCommands, auditEvents, serverActions };
+  return { container, rconCommands, auditEvents, serverActions, contactMessages };
 }

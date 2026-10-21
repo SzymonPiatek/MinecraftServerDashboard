@@ -8,7 +8,9 @@ export function FaqSection() {
         <div className={styles.layout}>
           <div className="section-head">
             <h2>Najczęstsze pytania</h2>
-            <p>Nie znalazłeś odpowiedzi? Napisz do admina.</p>
+            <p>
+              Nie znalazłeś odpowiedzi? <a href="#kontakt">Napisz do admina</a> przez formularz.
+            </p>
           </div>
 
           <div className={styles.list}>

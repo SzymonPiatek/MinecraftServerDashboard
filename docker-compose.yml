@@ -54,6 +54,12 @@ services:
       RCON_PASSWORD: ${RCON_PASSWORD}
       MC_CONTAINER_NAME: minecraft
       DOCKER_API_URL: http://docker-proxy:2375
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-no-reply@spiatek.pl}
+      CONTACT_TO: ${CONTACT_TO:-kontakt@spiatek.pl}
     volumes:
       - api-data:/data
     networks: [internal, control]

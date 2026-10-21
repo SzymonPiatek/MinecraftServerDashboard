@@ -8,6 +8,7 @@ import type { Container } from "./container.js";
 import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { createAdminRoutes } from "./modules/admin/admin.routes.js";
 import { createAuthRoutes } from "./modules/auth/auth.routes.js";
+import { createContactRoutes } from "./modules/contact/contact.routes.js";
 import { createRequireAdmin } from "./modules/auth/require-admin.js";
 import { createPublicRoutes } from "./modules/minecraft/public.routes.js";
 
@@ -36,6 +37,7 @@ export function createApp(container: Container): Express {
     res.json({ ok: true });
   });
   api.use(createPublicRoutes(container.minecraft));
+  api.use("/contact", createContactRoutes(container.contact));
   api.use(
     "/auth",
     createAuthRoutes({

@@ -5,6 +5,7 @@ const links = [
   { href: "#status", label: "Status" },
   { href: "#join", label: "Jak dołączyć" },
   { href: "#faq", label: "FAQ" },
+  { href: "#kontakt", label: "Kontakt" },
 ];
 
 export function SiteNav() {
