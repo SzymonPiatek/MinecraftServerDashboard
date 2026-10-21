@@ -34,7 +34,7 @@ services:
     environment:
       JAVA_TOOL_OPTIONS: -Xmx768m
     volumes:
-      - ./bluemap/config:/app/config:ro
+      - ./bluemap/config:/app/config
       - ${MC_DATA_DIR:-/home/ubuntu/server}/world:/app/world:ro
       - bluemap-data:/app/data
       - bluemap-web:/app/web
