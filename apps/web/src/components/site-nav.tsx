@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { siteConfig } from "@/lib/site-config";
 import { buttonVariants } from "./ui/button";
 
@@ -19,10 +20,7 @@ export function SiteNav() {
           className="inline-flex items-center gap-2 font-bold tracking-tight whitespace-nowrap text-ink no-underline max-sm:hidden"
           href="#top"
         >
-          <span
-            className="size-[1.1rem] rounded-sm border-[1.5px] border-ink bg-mint shadow-[inset_0_-5px_0_var(--color-accent)]"
-            aria-hidden="true"
-          />
+          <Image src="/favicon.ico" alt="" width={24} height={24} unoptimized />
           {siteConfig.name}
         </a>
         <ul className="m-0 flex list-none gap-1 p-0">
