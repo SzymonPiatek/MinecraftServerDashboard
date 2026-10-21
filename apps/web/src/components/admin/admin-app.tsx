@@ -1,32 +1,11 @@
 "use client";
 
-import type { AdminSession } from "@mcd/shared";
-import { useCallback, useEffect, useState } from "react";
-import { SESSION_EXPIRED_EVENT, adminFetch } from "@/lib/admin-api";
+import { useAdminSession } from "@/hooks/use-admin-session";
 import { Dashboard } from "./dashboard";
 import { LoginForm } from "./login-form";
 
-type Session = { phase: "loading" } | { phase: "anonymous" } | { phase: "admin"; admin: AdminSession };
-
 export function AdminApp() {
-  const [session, setSession] = useState<Session>({ phase: "loading" });
-
-  useEffect(() => {
-    adminFetch<AdminSession>("/auth/me")
-      .then((admin) => setSession({ phase: "admin", admin }))
-      .catch(() => setSession({ phase: "anonymous" }));
-  }, []);
-
-  useEffect(() => {
-    const expire = () => setSession({ phase: "anonymous" });
-    window.addEventListener(SESSION_EXPIRED_EVENT, expire);
-    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, expire);
-  }, []);
-
-  const logout = useCallback(async () => {
-    await adminFetch("/auth/logout", { method: "POST" }).catch(() => undefined);
-    setSession({ phase: "anonymous" });
-  }, []);
+  const { session, signIn, signOut } = useAdminSession();
 
   if (session.phase === "loading") {
     return (
@@ -38,7 +17,7 @@ export function AdminApp() {
     );
   }
   if (session.phase === "anonymous") {
-    return <LoginForm onLogin={(admin) => setSession({ phase: "admin", admin })} />;
+    return <LoginForm onLogin={signIn} />;
   }
-  return <Dashboard admin={session.admin} onLogout={logout} />;
+  return <Dashboard admin={session.admin} onLogout={signOut} />;
 }

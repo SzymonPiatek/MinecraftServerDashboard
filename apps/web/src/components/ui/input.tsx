@@ -5,8 +5,8 @@ import { cn } from "@/lib/cn";
 export const inputVariants = cva("w-full rounded-input border-2 bg-paper font-normal text-ink", {
   variants: {
     size: {
-      md: "p-4",
-      lg: "p-5 text-lg",
+      md: "p-2",
+      lg: "p-2.5 text-lg",
     },
     state: {
       default: "border-ink",

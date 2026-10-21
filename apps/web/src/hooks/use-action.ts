@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { errorMessage } from "@/lib/admin-api";
+import { errorMessage } from "@/lib/api";
 
 export interface ActionFeedback {
   tone: "ok" | "error";

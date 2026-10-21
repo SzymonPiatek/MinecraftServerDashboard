@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef, useState, type SubmitEvent } from "react";
-import { adminFetch } from "@/lib/admin-api";
+import { useAction } from "@/hooks/use-action";
+import { adminActions } from "@/lib/api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
-import { useAction } from "./use-action";
 
 interface Entry {
   command: string;
@@ -23,9 +23,7 @@ export function ConsolePanel() {
     event.preventDefault();
     const sent = command.trim();
     if (!sent) return;
-    const result = await run(() =>
-      adminFetch<{ output: string }>("/admin/console", { method: "POST", body: { command: sent } }),
-    );
+    const result = await run(() => adminActions.runConsoleCommand(sent));
     if (!result) return;
     setHistory((prev) => [...prev.slice(-49), { command: sent, output: result.output }]);
     setCommand("");

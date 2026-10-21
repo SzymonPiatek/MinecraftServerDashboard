@@ -2,13 +2,13 @@
 
 import { PLAYER_ACTIONS, type OnlinePlayers, type PlayerAction } from "@mcd/shared";
 import { useEffect, useState } from "react";
-import { adminFetch } from "@/lib/admin-api";
+import { useAction } from "@/hooks/use-action";
+import { adminActions, publicActions } from "@/lib/api";
 import { Button } from "../ui/button";
 import { Field } from "../ui/field";
 import { Input } from "../ui/input";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
-import { useAction } from "./use-action";
 
 const ACTION_LABEL: Record<PlayerAction, string> = {
   kick: "Kick",
@@ -28,7 +28,8 @@ export function PlayersPanel() {
   const { pending, feedback, run } = useAction();
 
   useEffect(() => {
-    adminFetch<OnlinePlayers>("/players")
+    publicActions
+      .getPlayers()
       .then(setOnline)
       .catch(() => setOnline(null));
   }, [reloads]);
@@ -38,11 +39,7 @@ export function PlayersPanel() {
     if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) return;
     if (DESTRUCTIVE.has(action) && !window.confirm(`${ACTION_LABEL[action]}: ${name}?`)) return;
     const result = await run(
-      () =>
-        adminFetch<{ message: string }>(`/admin/players/${encodeURIComponent(name)}/${action}`, {
-          method: "POST",
-          body: { reason: reason.trim() || undefined },
-        }),
+      () => adminActions.applyPlayerAction(name, action, { reason: reason.trim() || undefined }),
       (r) => r.message || `Wykonano: ${ACTION_LABEL[action]} ${name}.`,
     );
     if (result) setReloads((n) => n + 1);

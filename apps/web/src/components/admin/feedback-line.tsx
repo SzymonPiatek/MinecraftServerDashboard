@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import type { ActionFeedback } from "./use-action";
+import type { ActionFeedback } from "@/hooks/use-action";
 
 export function FeedbackLine({ feedback }: { feedback: ActionFeedback | null }) {
   return (

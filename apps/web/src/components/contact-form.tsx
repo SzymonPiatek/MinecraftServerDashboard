@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type SubmitEvent } from "react";
+import { contactActions, errorMessage } from "@/lib/api";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Field } from "./ui/field";
@@ -8,23 +9,6 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
 type Phase = "idle" | "sending" | "sent" | "error";
-
-const FALLBACK_ERROR = "Nie udało się wysłać wiadomości.";
-
-async function sendMessage(form: HTMLFormElement): Promise<string | null> {
-  try {
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.fromEntries(new FormData(form))),
-    });
-    if (res.ok) return null;
-    const body = (await res.json().catch(() => null)) as { error?: string } | null;
-    return body?.error ?? FALLBACK_ERROR;
-  } catch {
-    return FALLBACK_ERROR;
-  }
-}
 
 export function ContactForm() {
   const [phase, setPhase] = useState<Phase>("idle");
@@ -34,9 +18,10 @@ export function ContactForm() {
     event.preventDefault();
     const form = event.currentTarget;
     setPhase("sending");
-    const failure = await sendMessage(form);
-    if (failure) {
-      setError(failure);
+    try {
+      await contactActions.send(Object.fromEntries(new FormData(form)));
+    } catch (e) {
+      setError(errorMessage(e));
       setPhase("error");
       return;
     }

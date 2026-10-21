@@ -1,15 +1,18 @@
 import Image from "next/image";
 import { cva } from "class-variance-authority";
 
-const blockVariants = cva("absolute h-auto transition-[scale] duration-240 ease-spring hover:scale-110", {
-  variants: {
-    float: {
-      slow: "animate-float-slow",
-      mid: "animate-float-mid",
-      fast: "animate-float-fast",
+const blockVariants = cva(
+  ["absolute", "h-auto", "transition-[scale]", "duration-240", "ease-spring", "hover:scale-110"],
+  {
+    variants: {
+      float: {
+        slow: "animate-float-slow",
+        mid: "animate-float-mid",
+        fast: "animate-float-fast",
+      },
     },
   },
-});
+);
 
 /** Positions are percentages of the 400×420 art box, so the stack scales with its container. */
 const BLOCKS = [

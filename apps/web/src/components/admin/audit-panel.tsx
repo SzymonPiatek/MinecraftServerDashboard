@@ -2,11 +2,11 @@
 
 import type { AuditLogEntry } from "@mcd/shared";
 import { useCallback, useEffect, useState } from "react";
-import { adminFetch } from "@/lib/admin-api";
+import { useAction } from "@/hooks/use-action";
+import { adminActions } from "@/lib/api";
 import { Button } from "../ui/button";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
-import { useAction } from "./use-action";
 
 const formatDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "short", timeStyle: "medium" });
 
@@ -15,10 +15,7 @@ export function AuditPanel({ className }: { className?: string }) {
   const { pending, feedback, run } = useAction();
 
   const load = useCallback(
-    () =>
-      run(async () =>
-        setEntries((await adminFetch<{ entries: AuditLogEntry[] }>("/admin/audit-log?limit=50")).entries),
-      ),
+    () => run(async () => setEntries((await adminActions.getAuditLog()).entries)),
     [run],
   );
 

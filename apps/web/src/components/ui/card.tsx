@@ -20,7 +20,13 @@ export const cardVariants = cva("rounded-card border-2 border-ink", {
       false: "",
     },
     interactive: {
-      true: "transition-[transform,box-shadow] duration-240 ease-spring hover:-translate-y-1 hover:shadow-card-lift",
+      true: [
+        "transition-[transform,box-shadow]",
+        "duration-240",
+        "ease-spring",
+        "group-hover/card:-translate-y-1",
+        "group-hover/card:shadow-card-lift",
+      ],
       false: "",
     },
   },
@@ -38,10 +44,22 @@ export function Card<T extends ElementType = "div">({
   elevated,
   interactive,
   className,
+  children,
   ...props
 }: CardProps<T>) {
   const Component: ElementType = as ?? "div";
+  const surface = cn(cardVariants({ tone, padding, elevated, interactive }), className);
+
+  if (!interactive) {
+    return (
+      <Component className={surface} {...props}>
+        {children}
+      </Component>
+    );
+  }
   return (
-    <Component className={cn(cardVariants({ tone, padding, elevated, interactive }), className)} {...props} />
+    <Component className="group/card" {...props}>
+      <div className={cn(surface, "h-full")}>{children}</div>
+    </Component>
   );
 }
