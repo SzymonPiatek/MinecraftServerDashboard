@@ -16,7 +16,14 @@ export function SiteNav() {
       <NavList>
         {links.map((link) => (
           <li key={link.href}>
-            <a className={buttonVariants({ variant: "ghost", size: "sm" })} href={link.href}>
+            <a
+              className={buttonVariants({
+                variant: "ghost",
+                size: "sm",
+                className: "max-sm:px-2 max-sm:py-2",
+              })}
+              href={link.href}
+            >
               {link.label}
             </a>
           </li>

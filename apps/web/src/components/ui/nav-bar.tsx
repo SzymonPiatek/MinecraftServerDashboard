@@ -8,7 +8,7 @@ export function FloatingNav({ className, children, ...props }: ComponentProps<"n
     <header className="pointer-events-none fixed inset-x-0 top-4 z-10 flex justify-center px-(--page-gutter)">
       <nav
         className={cn(
-          "pointer-events-auto flex max-w-full items-center justify-between gap-6 rounded-pill border-[1.5px] border-ink bg-[color-mix(in_oklch,var(--color-paper)_88%,transparent)] py-2 pr-2 pl-4 shadow-[0_3px_0_var(--color-ink)] backdrop-blur-md max-sm:p-1",
+          "pointer-events-auto flex max-w-full items-center justify-between gap-6 rounded-pill border-[1.5px] border-ink bg-[color-mix(in_oklch,var(--color-paper)_88%,transparent)] py-2 pr-2 pl-4 max-sm:w-full max-sm:justify-center shadow-[0_3px_0_var(--color-ink)] backdrop-blur-md max-sm:p-1",
           className,
         )}
         {...props}
@@ -35,5 +35,7 @@ export function NavBrand({ className, children, ...props }: ComponentProps<"a">)
 }
 
 export function NavList({ className, ...props }: ComponentProps<"ul">) {
-  return <ul className={cn("m-0 flex list-none items-center gap-1 p-0", className)} {...props} />;
+  return (
+    <ul className={cn("m-0 flex list-none items-center gap-1 p-0 max-sm:gap-0", className)} {...props} />
+  );
 }
