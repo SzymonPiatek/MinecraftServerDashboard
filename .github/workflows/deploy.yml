@@ -35,6 +35,7 @@ jobs:
           file: apps/${{ matrix.service }}/Dockerfile
           platforms: linux/amd64
           push: true
+          provenance: false
           tags: |
             ${{ env.IMAGE }}:${{ env.TAG }}
             ${{ env.IMAGE }}:latest
