@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans, VT323 } from "next/font/google";
+import { ToastProvider } from "@/components/ui/toast";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
@@ -15,6 +16,12 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
+const vt323 = VT323({
+  variable: "--font-vt323",
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: `${siteConfig.name} – serwer Minecraft`,
   description: siteConfig.description,
@@ -22,8 +29,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pl" className={`${jakarta.variable} ${jetbrains.variable}`}>
-      <body>{children}</body>
+    <html lang="pl" className={`${jakarta.variable} ${jetbrains.variable} ${vt323.variable}`}>
+      <body>
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

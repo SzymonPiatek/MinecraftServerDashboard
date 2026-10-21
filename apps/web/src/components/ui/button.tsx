@@ -2,6 +2,24 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
+const MC_BUTTON = [
+  "rounded-none",
+  "border-3",
+  "border-solid",
+  "bg-transparent",
+  "font-pixel",
+  "font-normal",
+  "text-white",
+  "[font-size:1.6em]",
+  "[text-shadow:2px_2px_0_#3f3f3f]",
+  "[image-rendering:pixelated]",
+  "[border-image:url(/widget/button.png)_1_fill/1/0_stretch]",
+  "group-hover/btn:group-enabled/btn:text-[#ffffa0]",
+  "group-hover/btn:group-enabled/btn:[border-image-source:url(/widget/button_highlighted.png)]",
+  "group-disabled/btn:text-[#a0a0a0]",
+  "group-disabled/btn:[border-image-source:url(/widget/button_disabled.png)]",
+];
+
 export const buttonVariants = cva(
   [
     "inline-flex",
@@ -11,37 +29,15 @@ export const buttonVariants = cva(
     "whitespace-nowrap",
     "text-ink",
     "no-underline",
-    "transition-[transform,box-shadow,background-color]",
+    "transition-[background-color]",
     "duration-160",
     "ease-snap",
   ],
   {
     variants: {
       variant: {
-        primary: [
-          "rounded-input",
-          "border-2",
-          "border-ink",
-          "bg-accent",
-          "font-bold",
-          "shadow-[0_5px_0_var(--color-ink)]",
-          "group-hover/btn:group-enabled/btn:-translate-y-0.5",
-          "group-hover/btn:group-enabled/btn:shadow-[0_7px_0_var(--color-ink)]",
-          "group-active/btn:group-enabled/btn:translate-y-[3px]",
-          "group-active/btn:group-enabled/btn:shadow-[0_2px_0_var(--color-ink)]",
-        ],
-        secondary: [
-          "rounded-input",
-          "border-2",
-          "border-ink",
-          "bg-paper",
-          "font-bold",
-          "shadow-[0_5px_0_var(--color-ink)]",
-          "group-hover/btn:group-enabled/btn:-translate-y-0.5",
-          "group-hover/btn:group-enabled/btn:shadow-[0_7px_0_var(--color-ink)]",
-          "group-active/btn:group-enabled/btn:translate-y-[3px]",
-          "group-active/btn:group-enabled/btn:shadow-[0_2px_0_var(--color-ink)]",
-        ],
+        primary: MC_BUTTON,
+        secondary: MC_BUTTON,
         ghost: "rounded-pill font-medium hover:bg-accent",
       },
       size: {
@@ -62,8 +58,8 @@ export function Button({ variant, size, className, type = "button", children, ..
     <button
       type={type}
       className={cn(
-        "group/btn inline-flex max-w-full cursor-pointer disabled:cursor-progress disabled:opacity-70",
-        variant === "ghost" ? "rounded-pill" : "rounded-input",
+        "group/btn inline-flex max-w-full cursor-pointer disabled:cursor-progress",
+        variant === "ghost" ? "rounded-pill disabled:opacity-70" : "rounded-none",
       )}
       {...props}
     >
