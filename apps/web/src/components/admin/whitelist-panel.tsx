@@ -1,26 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState, type SubmitEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { useAction } from "@/hooks/use-action";
-import { adminActions } from "@/lib/api";
+import { usePolling } from "@/hooks/use-polling";
+import { adminActions, errorMessage } from "@/lib/api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
+
+const POLL_MS = 15_000;
 
 export function WhitelistPanel({ className }: { className?: string }) {
   const [players, setPlayers] = useState<string[] | null>(null);
   const [username, setUsername] = useState("");
   const { pending, feedback, run } = useAction();
 
-  const load = useCallback(
-    () => run(async () => setPlayers((await adminActions.getWhitelist()).players)),
-    [run],
-  );
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  usePolling(async (signal) => {
+    try {
+      setPlayers((await adminActions.getWhitelist({ signal })).players);
+      setLoadError(null);
+    } catch (e) {
+      if (signal.aborted) throw e;
+      setLoadError(errorMessage(e));
+    }
+  }, POLL_MS);
 
   async function add(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -44,15 +50,7 @@ export function WhitelistPanel({ className }: { className?: string }) {
   }
 
   return (
-    <Panel
-      title={`Whitelista${players ? ` (${players.length})` : ""}`}
-      className={className}
-      actions={
-        <Button variant="ghost" size="sm" disabled={pending} onClick={() => void load()}>
-          Odśwież
-        </Button>
-      }
-    >
+    <Panel title={`Whitelista${players ? ` (${players.length})` : ""}`} className={className}>
       <form className="flex gap-3" onSubmit={add}>
         <Input
           value={username}
@@ -69,7 +67,7 @@ export function WhitelistPanel({ className }: { className?: string }) {
           Dodaj
         </Button>
       </form>
-      <FeedbackLine feedback={feedback} />
+      <FeedbackLine feedback={feedback ?? (loadError ? { tone: "error", text: loadError } : null)} />
       {players?.length === 0 && <p className="text-ink-muted">Whitelista jest pusta.</p>}
       <ul className="m-0 grid max-h-72 list-none gap-2 overflow-y-auto p-0">
         {players?.map((name) => (

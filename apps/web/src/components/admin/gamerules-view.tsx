@@ -1,10 +1,11 @@
 "use client";
 
 import type { Gamerule } from "@mcd/shared";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { describeGamerule } from "@/lib/gamerule-descriptions";
 import { useAction } from "@/hooks/use-action";
-import { adminActions } from "@/lib/api";
+import { usePolling } from "@/hooks/use-polling";
+import { adminActions, errorMessage } from "@/lib/api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Container } from "../ui/section";
@@ -13,6 +14,8 @@ import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
 import { SettingRow, SettingsHeader } from "./setting-row";
 
+const POLL_MS = 30_000;
+
 type SetRule = (name: string, value: boolean | number) => void;
 
 export function GamerulesView({ onLogout }: { onLogout: () => void }) {
@@ -20,12 +23,18 @@ export function GamerulesView({ onLogout }: { onLogout: () => void }) {
   const [filter, setFilter] = useState("");
   const { pending, feedback, run } = useAction();
 
-  // Reading every rule takes a couple of seconds, so it is loaded once and refreshed on demand.
-  const load = useCallback(() => run(async () => setRules((await adminActions.getGamerules()).rules)), [run]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  // Reading every rule takes a couple of seconds, hence the longer interval.
+  usePolling(async (signal) => {
+    try {
+      setRules((await adminActions.getGamerules({ signal })).rules);
+      setLoadError(null);
+    } catch (e) {
+      if (signal.aborted) throw e;
+      setLoadError(errorMessage(e));
+    }
+  }, POLL_MS);
 
   async function set(name: string, value: boolean | number) {
     const saved = await run(
@@ -42,14 +51,7 @@ export function GamerulesView({ onLogout }: { onLogout: () => void }) {
       <AdminNav onLogout={onLogout} />
       <main>
         <Container className="pt-24 pb-8 md:pt-28">
-          <Panel
-            title={`Gamerule${rules ? ` (${rules.length})` : ""}`}
-            actions={
-              <Button variant="ghost" size="sm" disabled={pending} onClick={() => void load()}>
-                Odśwież
-              </Button>
-            }
-          >
+          <Panel title={`Gamerule${rules ? ` (${rules.length})` : ""}`}>
             <Input
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -58,8 +60,10 @@ export function GamerulesView({ onLogout }: { onLogout: () => void }) {
               aria-label="Szukaj reguły"
               placeholder="Szukaj reguły"
             />
-            <FeedbackLine feedback={feedback} />
-            {!rules && !feedback && <p className="text-ink-muted">Wczytuję reguły z serwera…</p>}
+            <FeedbackLine feedback={feedback ?? (loadError ? { tone: "error", text: loadError } : null)} />
+            {!rules && !feedback && !loadError && (
+              <p className="text-ink-muted">Wczytuję reguły z serwera…</p>
+            )}
             {visible?.length === 0 && <p className="text-ink-muted">Brak pasujących reguł.</p>}
             {visible && visible.length > 0 && (
               <div>

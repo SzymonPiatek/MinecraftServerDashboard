@@ -1,13 +1,14 @@
 "use client";
 
 import type { AuditLogEntry } from "@mcd/shared";
-import { useCallback, useEffect, useState } from "react";
-import { useAction } from "@/hooks/use-action";
-import { adminActions } from "@/lib/api";
+import { useState } from "react";
+import { usePolling } from "@/hooks/use-polling";
+import { adminActions, errorMessage } from "@/lib/api";
 import { cn } from "@/lib/cn";
-import { Button } from "../ui/button";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
+
+const POLL_MS = 15_000;
 
 const COLUMNS = ["Kiedy", "Admin", "Akcja", "Cel / szczegóły"];
 
@@ -19,28 +20,21 @@ const formatDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "short", timeSt
 
 export function AuditPanel({ className }: { className?: string }) {
   const [entries, setEntries] = useState<AuditLogEntry[] | null>(null);
-  const { pending, feedback, run } = useAction();
+  const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(
-    () => run(async () => setEntries((await adminActions.getAuditLog()).entries)),
-    [run],
-  );
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  usePolling(async (signal) => {
+    try {
+      setEntries((await adminActions.getAuditLog(undefined, { signal })).entries);
+      setError(null);
+    } catch (e) {
+      if (signal.aborted) throw e;
+      setError(errorMessage(e));
+    }
+  }, POLL_MS);
 
   return (
-    <Panel
-      title="Dziennik akcji"
-      className={className}
-      actions={
-        <Button variant="ghost" size="sm" disabled={pending} onClick={() => void load()}>
-          Odśwież
-        </Button>
-      }
-    >
-      <FeedbackLine feedback={feedback} />
+    <Panel title="Dziennik akcji" className={className}>
+      <FeedbackLine feedback={error ? { tone: "error", text: error } : null} />
       {entries?.length === 0 && <p className="text-ink-muted">Brak wpisów.</p>}
       {entries && entries.length > 0 && (
         // Columns take the width their content needs; when that exceeds the panel, the table scrolls sideways.

@@ -45,7 +45,8 @@ export const publicActions = {
 };
 
 export const adminActions = {
-  getWhitelist: () => apiFetcher<{ players: string[] }>(apiRoutes.admin.whitelist),
+  getWhitelist: ({ signal }: WithSignal = {}) =>
+    apiFetcher<{ players: string[] }>(apiRoutes.admin.whitelist, { signal }),
   addToWhitelist: (username: string) =>
     apiFetcher(apiRoutes.admin.whitelist, { method: "POST", body: { username } }),
   removeFromWhitelist: (username: string) =>
@@ -54,7 +55,8 @@ export const adminActions = {
   getLogs: (after?: string, { signal }: WithSignal = {}) =>
     apiFetcher<{ lines: LogLine[] }>(apiRoutes.admin.logs, { query: { after }, signal }),
 
-  getGamerules: () => apiFetcher<{ rules: Gamerule[] }>(apiRoutes.admin.gamerules),
+  getGamerules: ({ signal }: WithSignal = {}) =>
+    apiFetcher<{ rules: Gamerule[] }>(apiRoutes.admin.gamerules, { signal }),
   setGamerule: (name: string, value: boolean | number) =>
     apiFetcher<Gamerule>(apiRoutes.admin.gamerule(name), { method: "PUT", body: { value } }),
 
@@ -82,6 +84,6 @@ export const adminActions = {
   controlServer: (action: ServerControlAction) =>
     apiFetcher<{ state: ServiceState }>(apiRoutes.admin.serverAction(action), { method: "POST" }),
 
-  getAuditLog: (limit = 50) =>
-    apiFetcher<{ entries: AuditLogEntry[] }>(apiRoutes.admin.auditLog, { query: { limit } }),
+  getAuditLog: (limit = 50, { signal }: WithSignal = {}) =>
+    apiFetcher<{ entries: AuditLogEntry[] }>(apiRoutes.admin.auditLog, { query: { limit }, signal }),
 };
