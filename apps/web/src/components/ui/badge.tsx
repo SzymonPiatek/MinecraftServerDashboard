@@ -2,27 +2,35 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
+/** Minecraft slot holding a label: same sprite as `Avatar`, with a dark inventory-grey inside. */
 export const badgeVariants = cva(
   [
     "inline-flex",
     "items-center",
     "gap-2",
-    "rounded-pill",
-    "border-[1.5px]",
-    "border-ink",
-    "py-1",
-    "pr-4",
-    "font-semibold",
+    "rounded-none",
+    "border-6",
+    "border-solid",
+    "bg-[#8b8b8b]",
+    "bg-clip-padding",
+    "px-2",
+    "font-pixel",
+    "text-xl",
+    "leading-none",
+    "text-white",
+    "[text-shadow:2px_2px_0_#3f3f3f]",
+    "[image-rendering:pixelated]",
+    "[border-image:url(/container/slot.png)_3/1/0_stretch]",
   ],
   {
     variants: {
       tone: {
-        muted: "bg-paper-2",
-        paper: "bg-paper",
+        muted: "",
+        paper: "",
       },
       leading: {
-        dot: "pl-2 text-sm",
-        avatar: "pl-1",
+        dot: "py-1.5",
+        avatar: "py-0 pl-0",
       },
     },
     defaultVariants: { tone: "paper", leading: "dot" },
