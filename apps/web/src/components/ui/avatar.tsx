@@ -3,7 +3,16 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
 export const avatarVariants = cva(
-  "grid size-8 place-items-center rounded-lg border-[1.5px] border-ink text-sm font-bold",
+  [
+    "grid",
+    "size-8",
+    "place-items-center",
+    "rounded-lg",
+    "border-[1.5px]",
+    "border-ink",
+    "text-sm",
+    "font-bold",
+  ],
   {
     variants: {
       tint: {

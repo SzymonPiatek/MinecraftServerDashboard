@@ -3,14 +3,45 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
 export const buttonVariants = cva(
-  "inline-flex min-w-0 items-center justify-center whitespace-nowrap text-ink no-underline transition-[transform,box-shadow,background-color] duration-160 ease-snap",
+  [
+    "inline-flex",
+    "min-w-0",
+    "items-center",
+    "justify-center",
+    "whitespace-nowrap",
+    "text-ink",
+    "no-underline",
+    "transition-[transform,box-shadow,background-color]",
+    "duration-160",
+    "ease-snap",
+  ],
   {
     variants: {
       variant: {
-        primary:
-          "rounded-input border-2 border-ink bg-accent font-bold shadow-[0_5px_0_var(--color-ink)] group-hover/btn:group-enabled/btn:-translate-y-0.5 group-hover/btn:group-enabled/btn:shadow-[0_7px_0_var(--color-ink)] group-active/btn:group-enabled/btn:translate-y-[3px] group-active/btn:group-enabled/btn:shadow-[0_2px_0_var(--color-ink)]",
-        secondary:
-          "rounded-input border-2 border-ink bg-paper font-bold shadow-[0_5px_0_var(--color-ink)] group-hover/btn:group-enabled/btn:-translate-y-0.5 group-hover/btn:group-enabled/btn:shadow-[0_7px_0_var(--color-ink)] group-active/btn:group-enabled/btn:translate-y-[3px] group-active/btn:group-enabled/btn:shadow-[0_2px_0_var(--color-ink)]",
+        primary: [
+          "rounded-input",
+          "border-2",
+          "border-ink",
+          "bg-accent",
+          "font-bold",
+          "shadow-[0_5px_0_var(--color-ink)]",
+          "group-hover/btn:group-enabled/btn:-translate-y-0.5",
+          "group-hover/btn:group-enabled/btn:shadow-[0_7px_0_var(--color-ink)]",
+          "group-active/btn:group-enabled/btn:translate-y-[3px]",
+          "group-active/btn:group-enabled/btn:shadow-[0_2px_0_var(--color-ink)]",
+        ],
+        secondary: [
+          "rounded-input",
+          "border-2",
+          "border-ink",
+          "bg-paper",
+          "font-bold",
+          "shadow-[0_5px_0_var(--color-ink)]",
+          "group-hover/btn:group-enabled/btn:-translate-y-0.5",
+          "group-hover/btn:group-enabled/btn:shadow-[0_7px_0_var(--color-ink)]",
+          "group-active/btn:group-enabled/btn:translate-y-[3px]",
+          "group-active/btn:group-enabled/btn:shadow-[0_2px_0_var(--color-ink)]",
+        ],
         ghost: "rounded-pill font-medium hover:bg-accent",
       },
       size: {

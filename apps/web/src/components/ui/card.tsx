@@ -20,7 +20,13 @@ export const cardVariants = cva("rounded-card border-2 border-ink", {
       false: "",
     },
     interactive: {
-      true: "transition-[transform,box-shadow] duration-240 ease-spring group-hover/card:-translate-y-1 group-hover/card:shadow-card-lift",
+      true: [
+        "transition-[transform,box-shadow]",
+        "duration-240",
+        "ease-spring",
+        "group-hover/card:-translate-y-1",
+        "group-hover/card:shadow-card-lift",
+      ],
       false: "",
     },
   },
