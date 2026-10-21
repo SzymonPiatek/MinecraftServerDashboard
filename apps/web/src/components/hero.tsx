@@ -1,7 +1,6 @@
 import { siteConfig } from "@/lib/site-config";
 import { BlockArt } from "./block-art";
 import { CopyAddress } from "./copy-address";
-import { StatusPill } from "./status-pill";
 import { Container } from "./ui/section";
 
 export function Hero() {
@@ -12,7 +11,6 @@ export function Hero() {
     >
       <Container className="grid items-center gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <div className="grid justify-items-start gap-6">
-          <StatusPill />
           <h1 className="min-w-0 text-display">
             {siteConfig.name}.{" "}
             <span className="inline-block rounded-[0.15em] bg-accent px-[0.15em] box-decoration-clone">

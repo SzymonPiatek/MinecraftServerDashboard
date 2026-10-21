@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import type { ReactNode } from "react";
 import { useServerData } from "./server-data";
 import { cn } from "@/lib/cn";
 import { Avatar, AVATAR_TINTS } from "./ui/avatar";
@@ -12,12 +14,29 @@ function tintFor(name: string) {
   return AVATAR_TINTS[hash % AVATAR_TINTS.length];
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div>
       <dt className="text-sm text-ink-muted">{label}</dt>
-      <dd className="m-0 font-mono text-lg font-medium wrap-anywhere">{value}</dd>
+      <dd className="m-0 flex items-center gap-2 font-mono text-lg font-medium wrap-anywhere">{value}</dd>
     </div>
+  );
+}
+
+function PlayerHead() {
+  return <Image src="/status/player_head.png" alt="" width={96} height={96} unoptimized className="size-8" />;
+}
+
+function PingIcon({ reachable }: { reachable: boolean }) {
+  return (
+    <Image
+      src={reachable ? "/status/server_ping.png" : "/status/server_unreachable.png"}
+      alt={reachable ? "Serwer odpowiada" : "Serwer niedostępny"}
+      width={10}
+      height={7}
+      unoptimized
+      className="h-[21px] w-[30px] [image-rendering:pixelated]"
+    />
   );
 }
 
@@ -46,7 +65,7 @@ export function StatusSection() {
               )}
             >
               {loading
-                ? "Sprawdzam…"
+                ? "..."
                 : unreachable && !status
                   ? "Brak danych"
                   : status?.online
@@ -56,11 +75,21 @@ export function StatusSection() {
             <dl className="m-0 grid grid-cols-3 gap-4">
               <Stat
                 label="Gracze"
-                value={status?.online ? `${status.playersOnline}/${status.playersMax}` : "—"}
+                value={
+                  <>
+                    <PlayerHead />
+                    {status?.online ? `${status.playersOnline}/${status.playersMax}` : "—"}
+                  </>
+                }
               />
               <Stat
                 label="Ping"
-                value={status?.online && status.pingMs !== null ? `${Math.round(status.pingMs)} ms` : "—"}
+                value={
+                  <>
+                    <PingIcon reachable={!!status?.online} />
+                    {status?.online && status.pingMs !== null ? `${Math.round(status.pingMs)} ms` : "—"}
+                  </>
+                }
               />
               <Stat label="Wersja" value={status?.version ?? "—"} />
             </dl>
