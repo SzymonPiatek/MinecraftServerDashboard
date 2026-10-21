@@ -33,7 +33,7 @@ export function createContainer(env: Env): Container {
   const prisma = createPrismaClient(env.DATABASE_URL);
   const admins = createPrismaAdminRepository(prisma);
   const rcon = createRconClient({
-    host: env.MC_HOST,
+    host: env.RCON_HOST ?? env.MC_HOST,
     port: env.RCON_PORT,
     password: env.RCON_PASSWORD,
     timeoutMs: env.MC_TIMEOUT_MS,
