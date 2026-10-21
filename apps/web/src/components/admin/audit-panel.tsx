@@ -9,8 +9,11 @@ import { Button } from "../ui/button";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
 
-/** Shared by the header and the entries so the desktop columns line up (the log is always full width). */
-const ROW = "py-2 md:grid md:grid-cols-[10rem_7rem_11rem_minmax(0,1fr)] md:gap-x-4";
+const COLUMNS = ["Kiedy", "Admin", "Akcja", "Cel / szczegóły"];
+
+/** No wrapping, so a column is as wide as its longest value; the gap on the right keeps neighbours apart. */
+const CELL = "py-2 pr-6 whitespace-nowrap last:pr-0";
+const HEAD_CELL = "sticky top-0 border-b-2 border-ink bg-[#c6c6c6] font-bold";
 
 const formatDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "short", timeStyle: "medium" });
 
@@ -40,29 +43,31 @@ export function AuditPanel({ className }: { className?: string }) {
       <FeedbackLine feedback={feedback} />
       {entries?.length === 0 && <p className="text-ink-muted">Brak wpisów.</p>}
       {entries && entries.length > 0 && (
-        <div className="max-h-96 overflow-y-auto text-sm">
-          <div
-            className={cn(ROW, "sticky top-0 hidden border-b-2 border-ink bg-[#c6c6c6] font-bold md:grid")}
-          >
-            <span>Kiedy</span>
-            <span>Admin</span>
-            <span>Akcja</span>
-            <span>Cel / szczegóły</span>
-          </div>
-          <ul className="m-0 list-none p-0">
-            {entries.map((entry) => (
-              <li key={entry.id} className={cn(ROW, "flex flex-wrap gap-x-3 border-b border-line")}>
-                <span className="whitespace-nowrap text-ink-muted md:text-ink">
-                  {formatDate.format(new Date(entry.createdAt))}
-                </span>
-                <span>{entry.admin}</span>
-                <span className="font-mono">{entry.action}</span>
-                <span className="basis-full font-mono break-words md:basis-auto">
-                  {[entry.target, entry.details].filter(Boolean).join(" · ")}
-                </span>
-              </li>
-            ))}
-          </ul>
+        // Columns take the width their content needs; when that exceeds the panel, the table scrolls sideways.
+        <div className="max-h-96 min-w-0 overflow-auto text-sm">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr>
+                {COLUMNS.map((title) => (
+                  <th key={title} className={cn(HEAD_CELL, CELL)}>
+                    {title}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry) => (
+                <tr key={entry.id} className="border-b border-line">
+                  <td className={CELL}>{formatDate.format(new Date(entry.createdAt))}</td>
+                  <td className={CELL}>{entry.admin}</td>
+                  <td className={cn(CELL, "font-mono")}>{entry.action}</td>
+                  <td className={cn(CELL, "font-mono")}>
+                    {[entry.target, entry.details].filter(Boolean).join(" · ")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </Panel>
