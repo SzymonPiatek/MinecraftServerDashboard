@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useServerData } from "./server-data";
 import { cn } from "@/lib/cn";
 import { Avatar, AVATAR_TINTS } from "./ui/avatar";
@@ -12,6 +12,26 @@ import { Container, Section, SectionHead } from "./ui/section";
 function tintFor(name: string) {
   const hash = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return AVATAR_TINTS[hash % AVATAR_TINTS.length];
+}
+
+/** Bare skin head from mc-heads.net (no slot frame); falls back to the lettered slot for unknown (e.g. offline-mode) nicknames. */
+function PlayerAvatar({ name }: { name: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) return <Avatar tint={tintFor(name)} className="size-10">{name.charAt(0).toUpperCase()}</Avatar>;
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- external 8x8 skin head, no optimisation wanted
+    <img
+      src={`https://mc-heads.net/avatar/${encodeURIComponent(name)}/40`}
+      alt=""
+      width={40}
+      height={40}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className="size-10 [image-rendering:pixelated]"
+    />
+  );
 }
 
 function Stat({ label, value }: { label: string; value: ReactNode }) {
@@ -128,8 +148,8 @@ export function StatusSection() {
               <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
                 {players.players.map((name) => (
                   <li key={name}>
-                    <Badge leading="avatar" className="text-base whitespace-nowrap">
-                      <Avatar tint={tintFor(name)}>{name.charAt(0).toUpperCase()}</Avatar>
+                    <Badge leading="avatar" className="gap-3 pr-3 text-xl whitespace-nowrap">
+                      <PlayerAvatar name={name} />
                       {name}
                     </Badge>
                   </li>
