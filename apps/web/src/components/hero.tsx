@@ -27,7 +27,7 @@ export function Hero() {
             </a>
           </div>
         </div>
-        <div className="order-first mx-auto flex max-w-56 justify-center md:order-none md:mx-0 md:max-w-none">
+        <div className="order-first mx-auto flex max-w-72 justify-center md:order-none md:mx-0 md:max-w-none">
           <BlockArt />
         </div>
       </Container>
