@@ -112,3 +112,37 @@ describe("admin players, console and server control", () => {
     expect(harness.auditEvents.map((e) => e.action)).toEqual(["server.restart"]);
   });
 });
+
+describe("contact form", () => {
+  const body = { name: "Steve", email: "steve@example.com", message: "Dopisz mnie do whitelisty proszę" };
+
+  it("forwards a valid message without authentication", async () => {
+    await agent.post("/api/contact").send(body).expect(204);
+    expect(harness.contactMessages).toEqual([body]);
+  });
+
+  it("validates the body", async () => {
+    await agent
+      .post("/api/contact")
+      .send({ ...body, email: "nope" })
+      .expect(400);
+    await agent
+      .post("/api/contact")
+      .send({ ...body, message: "hi" })
+      .expect(400);
+    expect(harness.contactMessages).toEqual([]);
+  });
+
+  it("silently drops submissions that fill the honeypot", async () => {
+    await agent
+      .post("/api/contact")
+      .send({ ...body, website: "http://spam.example" })
+      .expect(204);
+    expect(harness.contactMessages).toEqual([]);
+  });
+
+  it("rate limits repeated submissions", async () => {
+    for (let i = 0; i < 5; i++) await agent.post("/api/contact").send(body).expect(204);
+    await agent.post("/api/contact").send(body).expect(429);
+  });
+});

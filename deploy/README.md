@@ -128,3 +128,19 @@ Następnie zaloguj się przez `POST /api/auth/login` i wyślij komendę `list` p
 | Konsola: „unreachable via RCON"           | serwer jeszcze się ładuje albo zmieniłeś `RCON_PASSWORD` bez restartu `minecraft` |
 | Minecraft: `Permission denied` na `/data` | właściciel `~/server` ma inny UID niż 1000 (`sudo chown -R 1000:1000 ~/server`)   |
 | Zmiana stanu serwera z panelu zwraca 503  | `docker compose logs docker-proxy api`                                            |
+
+## Poczta wysyłana ze strony
+
+Strona wysyła maile z `no-reply@spiatek.pl` (nadawca). Wiadomości z formularza kontaktowego trafiają na `kontakt@spiatek.pl`, a nagłówek Reply-To wskazuje e-mail osoby, która pisała, więc „Odpowiedz” w skrzynce kontakt@ idzie prosto do niej.
+
+Dodaj do `~/dashboard/.env`:
+
+```bash
+SMTP_HOST=<host-serwera-poczty>   # np. mail.spiatek.pl albo IP bramy Dockera (172.17.0.1)
+SMTP_PORT=587
+SMTP_USER=no-reply@spiatek.pl
+SMTP_PASSWORD=<haslo-skrzynki-no-reply>
+# opcjonalnie: SMTP_FROM (domyślnie no-reply@spiatek.pl), CONTACT_TO (domyślnie kontakt@spiatek.pl)
+```
+
+Skrzynki w docker-mailserver: `docker exec mailserver setup email add no-reply@spiatek.pl` oraz `... add kontakt@spiatek.pl`. Kontener `api` musi mieć dostęp do SMTP (stack mailserver jest w innej sieci Dockera). Bez `SMTP_HOST` formularz odpowiada błędem 503. Po zmianie `.env`: `docker compose up -d`.

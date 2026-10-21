@@ -1,42 +1,43 @@
-import styles from "./block-art.module.css";
+import Image from "next/image";
+import { cva } from "class-variance-authority";
 
-type Tint = "mint" | "pear" | "coral" | "cyan";
+const blockVariants = cva("absolute h-auto transition-[scale] duration-240 ease-spring hover:scale-110", {
+  variants: {
+    float: {
+      slow: "animate-float-slow",
+      mid: "animate-float-mid",
+      fast: "animate-float-fast",
+    },
+  },
+});
 
-interface CubeProps {
-  tint: Tint;
-  x: number;
-  y: number;
-  size: number;
-  className?: string;
-}
-
-/** Isometric cube; `x`/`y`/`size` position it inside the parent SVG viewBox. */
-function Cube({ tint, x, y, size, className }: CubeProps) {
-  const scale = size / 100;
-  return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`} className={`${styles[tint]} ${className ?? ""}`}>
-      <polygon className={styles.top} points="50,0 100,25 50,50 0,25" />
-      <polygon className={styles.left} points="0,25 50,50 50,115 0,90" />
-      <polygon className={styles.right} points="100,25 50,50 50,115 100,90" />
-      <rect className={styles.pixel} x="38" y="18" width="12" height="12" />
-      <rect className={styles.pixel} x="58" y="26" width="10" height="10" />
-      <rect className={styles.pixel} x="22" y="62" width="10" height="10" />
-    </g>
-  );
-}
+/** Positions are percentages of the 400×420 art box, so the stack scales with its container. */
+const BLOCKS = [
+  { src: "/blocks/Crafting_Table.png", alt: "Crafting Table", float: "slow", left: 4, top: 40, size: 58 },
+  { src: "/blocks/Furnace.png", alt: "Furnace", float: "mid", left: 58, top: 6, size: 38 },
+  { src: "/blocks/Glowstone.png", alt: "Glowstone", float: "fast", left: 8, top: 4, size: 32 },
+  { src: "/blocks/Diamond_Ore.png", alt: "Diamond Ore", float: "mid", left: 64, top: 54, size: 34 },
+] as const;
 
 export function BlockArt() {
   return (
-    <svg
-      className={styles.art}
-      viewBox="0 0 400 420"
+    <div
+      className="relative aspect-400/420 w-full max-w-xl"
       role="img"
-      aria-label="Ilustracja: stos kolorowych bloków"
+      aria-label="Ilustracja: stos bloków z Minecrafta"
     >
-      <Cube tint="mint" x={100} y={190} size={200} className={styles.floatSlow} />
-      <Cube tint="pear" x={10} y={60} size={110} className={styles.floatMid} />
-      <Cube tint="cyan" x={290} y={20} size={90} className={styles.floatFast} />
-      <Cube tint="coral" x={300} y={290} size={80} className={styles.floatMid} />
-    </svg>
+      {BLOCKS.map(({ src, float, left, top, size }) => (
+        <Image
+          key={src}
+          src={src}
+          alt=""
+          width={1024}
+          height={1024}
+          unoptimized
+          className={blockVariants({ float })}
+          style={{ left: `${left}%`, top: `${top}%`, width: `${size}%` }}
+        />
+      ))}
+    </div>
   );
 }

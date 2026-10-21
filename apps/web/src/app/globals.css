@@ -1,5 +1,7 @@
 /* Hallmark · macrostructure: Marquee Hero · tone: playful, technical · theme: Hum · nav: N5 floating pill · footer: Ft5 statement */
-:root {
+@import "tailwindcss";
+
+@theme {
   --color-paper: oklch(97% 0.012 95);
   --color-paper-2: oklch(94% 0.016 95);
   --color-paper-3: oklch(91% 0.02 95);
@@ -14,24 +16,19 @@
   --color-focus: oklch(55% 0.2 250);
   --color-online: oklch(62% 0.17 150);
 
-  --font-display: var(--font-sans), system-ui, sans-serif;
-  --font-body: var(--font-sans), system-ui, sans-serif;
-  --font-code: var(--font-mono), ui-monospace, monospace;
-
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2.5rem;
-  --space-2xl: 4rem;
-  --space-3xl: 6rem;
+  /* Pages are mobile-first; the layout switches at 52rem instead of Tailwind's 48rem. */
+  --breakpoint-md: 52rem;
 
   --text-sm: 0.875rem;
-  --text-base: 1rem;
+  --text-sm--line-height: 1.6;
   --text-lg: 1.25rem;
+  --text-lg--line-height: 1.6;
   --text-2xl: 2rem;
+  --text-2xl--line-height: 1.05;
   --text-3xl: 2.75rem;
+  --text-3xl--line-height: 1.05;
   --text-display: clamp(2.75rem, 7.5vw, 5.75rem);
+  --text-display--line-height: 1.05;
 
   --radius-input: 12px;
   --radius-card: 20px;
@@ -42,104 +39,93 @@
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
-  --dur-fast: 160ms;
-  --dur-base: 240ms;
 
-  --page-max: 72rem;
-  --page-gutter: clamp(1rem, 4vw, 2rem);
-}
+  --animate-float-slow: float 6s ease-in-out infinite;
+  --animate-float-mid: float 4.8s ease-in-out -1.2s infinite;
+  --animate-float-fast: float 3.8s ease-in-out -2.4s infinite;
+  --animate-pulse-ring: pulse-ring 2.4s ease-in-out infinite;
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  overflow-x: clip;
-  overscroll-behavior: none;
-}
-
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  background: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1,
-h2,
-h3,
-p {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-style: normal;
-  letter-spacing: -0.025em;
-  line-height: 1.05;
-}
-
-a {
-  color: var(--color-link);
-}
-
-:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
-
-.container {
-  width: min(100% - 2 * var(--page-gutter), var(--page-max));
-  margin-inline: auto;
-}
-
-.section {
-  padding-block: var(--space-3xl);
-  scroll-margin-top: var(--space-2xl);
-}
-
-.section-head {
-  display: grid;
-  gap: var(--space-sm);
-  max-width: 40rem;
-  margin-bottom: var(--space-xl);
-}
-
-.section-head h2 {
-  font-size: var(--text-3xl);
-}
-
-.section-head p {
-  color: var(--color-ink-muted);
-  font-size: var(--text-lg);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  @keyframes float {
+    50% {
+      translate: 0 -10px;
+    }
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+  @keyframes pulse-ring {
+    50% {
+      box-shadow: 0 0 0 5px color-mix(in oklch, var(--color-online) 25%, transparent);
+    }
+  }
+}
+
+/* The next/font variables live on <html>, so they are inlined instead of resolved at build time. */
+@theme inline {
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+@layer base {
+  :root {
+    --page-max: 72rem;
+    --page-gutter: clamp(1rem, 4vw, 2rem);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    overflow-x: clip;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    overflow-wrap: anywhere;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+  }
+
+  a {
+    color: var(--color-link);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 }

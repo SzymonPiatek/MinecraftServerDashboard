@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/** Compose passes unset optional variables as empty strings; treat those as absent. */
+const optionalString = z.preprocess((v) => (v === "" ? undefined : v), z.string().min(1).optional());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
@@ -26,6 +29,14 @@ const envSchema = z.object({
     .regex(/^[\w.-]+$/)
     .default("minecraft"),
   DOCKER_API_URL: z.url().default("http://docker-proxy:2375"),
+
+  // Contact form mail. Without SMTP_HOST the form answers 503 instead of silently dropping messages.
+  SMTP_HOST: optionalString,
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: optionalString,
+  SMTP_PASSWORD: optionalString,
+  SMTP_FROM: z.string().min(1).default("no-reply@spiatek.pl"),
+  CONTACT_TO: z.email().default("kontakt@spiatek.pl"),
 });
 
 export type Env = z.infer<typeof envSchema>;

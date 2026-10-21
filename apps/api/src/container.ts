@@ -6,6 +6,7 @@ import { createAuditService, type AuditService } from "./modules/audit/audit.ser
 import { createPrismaAdminRepository, type AdminRepository } from "./modules/auth/admin.repository.js";
 import { createAuthService, type AuthService } from "./modules/auth/auth.service.js";
 import { createSessionTokens } from "./modules/auth/session-token.js";
+import { createContactService, type ContactService } from "./modules/contact/contact.service.js";
 import { createRconClient, type RconClient } from "./modules/minecraft/rcon.client.js";
 import {
   createMinecraftStatusService,
@@ -19,6 +20,7 @@ export interface Container {
   admins: AdminRepository;
   auth: AuthService;
   audit: AuditService;
+  contact: ContactService;
   minecraft: MinecraftStatusService;
   rcon: RconClient;
   whitelist: WhitelistService;
@@ -42,6 +44,14 @@ export function createContainer(env: Env): Container {
     admins,
     auth: createAuthService(admins, createSessionTokens(env.JWT_SECRET, env.SESSION_TTL_HOURS)),
     audit: createAuditService(prisma),
+    contact: createContactService({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      user: env.SMTP_USER,
+      password: env.SMTP_PASSWORD,
+      from: env.SMTP_FROM,
+      to: env.CONTACT_TO,
+    }),
     minecraft: createMinecraftStatusService({
       host: env.MC_HOST,
       port: env.MC_PORT,
