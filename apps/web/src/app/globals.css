@@ -44,10 +44,18 @@
   --animate-float-mid: float 4.8s ease-in-out -1.2s infinite;
   --animate-float-fast: float 3.8s ease-in-out -2.4s infinite;
   --animate-pulse-ring: pulse-ring 2.4s ease-in-out infinite;
+  --animate-toast-in: toast-in 0.2s var(--ease-snap);
 
   @keyframes float {
     50% {
       translate: 0 -10px;
+    }
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
     }
   }
 
@@ -62,6 +70,7 @@
 @theme inline {
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-pixel: var(--font-vt323), ui-monospace, monospace;
 }
 
 @layer base {
@@ -83,7 +92,7 @@
 
   body {
     background: var(--color-paper);
-    color: var(--color-ink);
+    color: var(--color-paper);
     font-family: var(--font-sans);
     font-size: 1rem;
     line-height: 1.6;
@@ -113,6 +122,37 @@
     outline: 3px solid var(--color-focus);
     outline-offset: 3px;
     border-radius: 6px;
+  }
+
+  /* Minecraft scrollbar: a 1px bevel sprite as `border-image`, a flat body and a small grip in the middle (WebKit/Blink only). */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+    background: #000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    min-height: 24px;
+    min-width: 24px;
+    border: 1px solid;
+    border-image: url(/scroller.png) 1 / 1 / 0 stretch;
+    background-color: #c6c6c6;
+    background-image: repeating-linear-gradient(to bottom, #8b8b8b 0 1px, transparent 1px 2px);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 6px 5px;
+    image-rendering: pixelated;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #000;
+  }
+
+  /* Browsers without ::-webkit-scrollbar (Firefox) can only be recoloured. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-color: #8b8b8b #000;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

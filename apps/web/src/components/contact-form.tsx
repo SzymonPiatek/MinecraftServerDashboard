@@ -34,7 +34,7 @@ export function ContactForm() {
       <Field label="Nick lub imię">
         <Input name="name" required maxLength={64} autoComplete="nickname" />
       </Field>
-      <Field label="Twój e-mail (na niego odpowiem)">
+      <Field label="Twój e-mail">
         <Input name="email" type="email" required maxLength={254} autoComplete="email" />
       </Field>
       <Field label="Wiadomość">

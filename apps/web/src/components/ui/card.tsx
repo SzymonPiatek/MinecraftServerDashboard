@@ -2,36 +2,48 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentPropsWithoutRef, ElementType } from "react";
 import { cn } from "@/lib/cn";
 
-export const cardVariants = cva("rounded-card border-2 border-ink", {
-  variants: {
-    tone: {
-      paper: "bg-paper",
-      muted: "bg-paper-2",
-      accent: "bg-accent",
-      cyan: "bg-[color-mix(in_oklch,var(--color-accent-2)_55%,white)]",
-      mint: "bg-mint",
+/** Minecraft popup panel: a 7×7 sprite scaled 2× and sliced with `border-image`. The tone fills the inside. */
+export const cardVariants = cva(
+  [
+    "rounded-none",
+    "text-ink",
+    "border-6",
+    "border-solid",
+    "bg-clip-padding",
+    "[image-rendering:pixelated]",
+    "[border-image:url(/popup/background.png)_3/1/0_stretch]",
+  ],
+  {
+    variants: {
+      tone: {
+        paper: "bg-[#c6c6c6]",
+        muted: "bg-[#c6c6c6]",
+        accent: "bg-accent",
+        cyan: "bg-[color-mix(in_oklch,var(--color-accent-2)_55%,white)]",
+        mint: "bg-mint",
+      },
+      padding: {
+        none: "",
+        lg: "p-6 md:p-10",
+      },
+      elevated: {
+        true: "shadow-card",
+        false: "",
+      },
+      interactive: {
+        true: [
+          "transition-[transform,box-shadow]",
+          "duration-240",
+          "ease-spring",
+          "group-hover/card:-translate-y-1",
+          "group-hover/card:shadow-card-lift",
+        ],
+        false: "",
+      },
     },
-    padding: {
-      none: "",
-      lg: "p-6 md:p-10",
-    },
-    elevated: {
-      true: "shadow-card",
-      false: "",
-    },
-    interactive: {
-      true: [
-        "transition-[transform,box-shadow]",
-        "duration-240",
-        "ease-spring",
-        "group-hover/card:-translate-y-1",
-        "group-hover/card:shadow-card-lift",
-      ],
-      false: "",
-    },
+    defaultVariants: { tone: "paper", padding: "none", elevated: false, interactive: false },
   },
-  defaultVariants: { tone: "paper", padding: "none", elevated: false, interactive: false },
-});
+);
 
 type CardProps<T extends ElementType> = VariantProps<typeof cardVariants> & {
   as?: T;

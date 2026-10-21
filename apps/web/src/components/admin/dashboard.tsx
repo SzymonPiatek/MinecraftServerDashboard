@@ -3,7 +3,8 @@
 import type { AdminSession } from "@mcd/shared";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
+import { FloatingNav, NavBrand, NavList } from "../ui/nav-bar";
 import { Container } from "../ui/section";
 import { AuditPanel } from "./audit-panel";
 import { ConsolePanel } from "./console-panel";
@@ -14,24 +15,24 @@ import { WhitelistPanel } from "./whitelist-panel";
 export function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => void }) {
   return (
     <>
-      <header className="border-b-2 border-ink bg-paper-2">
-        <Container className="flex flex-wrap items-center justify-between gap-4 py-4">
-          <div>
-            <h1 className="text-lg">Panel admina · {siteConfig.name}</h1>
-            <p className="text-sm text-ink-muted">Zalogowano jako {admin.username}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link className="text-sm" href="/">
+      <FloatingNav aria-label="Nawigacja panelu admina">
+        <NavBrand href="/admin">Panel admina · {siteConfig.name}</NavBrand>
+        <NavList>
+          <li className="px-2 text-sm text-ink-muted max-md:hidden">Zalogowano jako {admin.username}</li>
+          <li>
+            <Link className={buttonVariants({ variant: "ghost", size: "sm" })} href="/">
               Strona serwera
             </Link>
-            <Button variant="secondary" size="sm" onClick={onLogout}>
+          </li>
+          <li>
+            <Button variant="ghost" size="sm" onClick={onLogout}>
               Wyloguj
             </Button>
-          </div>
-        </Container>
-      </header>
+          </li>
+        </NavList>
+      </FloatingNav>
       <main>
-        <Container className="grid items-start gap-6 py-8 md:grid-cols-2">
+        <Container className="grid items-start gap-6 pt-28 pb-8 md:grid-cols-2">
           <ServerPanel />
           <ConsolePanel />
           <WhitelistPanel />
