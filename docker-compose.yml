@@ -33,13 +33,29 @@ services:
       - ./docker/socket-proxy.haproxy.cfg.template:/usr/local/etc/haproxy/haproxy.cfg.template:ro
     networks: [control]
 
+  # One-shot: applies pending Prisma migrations to the API database, then exits. Keeps the Prisma CLI out of the API image.
+  migrate:
+    image: ${IMAGE_PREFIX:-mcd}-migrate:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: migrate
+    restart: "no"
+    volumes:
+      - api-data:/data
+    networks: [internal]
+
   api:
     image: ${IMAGE_PREFIX:-mcd}-api:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      target: runtime
     restart: unless-stopped
-    depends_on: [minecraft, docker-proxy]
+    depends_on:
+      minecraft: { condition: service_started }
+      docker-proxy: { condition: service_started }
+      migrate: { condition: service_completed_successfully }
     environment:
       NODE_ENV: production
       TRUST_PROXY: 1

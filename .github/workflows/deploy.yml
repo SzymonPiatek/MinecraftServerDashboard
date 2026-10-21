@@ -15,7 +15,10 @@ jobs:
       packages: write
     strategy:
       matrix:
-        service: [api, web]
+        include:
+          - { service: api, image: api, target: runtime }
+          - { service: api, image: migrate, target: migrate }
+          - { service: web, image: web, target: "" }
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -27,12 +30,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Compute image names
         run: |
-          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}-${{ matrix.service }}" >> "$GITHUB_ENV"
+          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}-${{ matrix.image }}" >> "$GITHUB_ENV"
           echo "TAG=sha-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
       - uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/${{ matrix.service }}/Dockerfile
+          target: ${{ matrix.target }}
           platforms: linux/amd64
           push: true
           provenance: false
@@ -40,8 +44,8 @@ jobs:
             ${{ env.IMAGE }}:${{ env.TAG }}
             ${{ env.IMAGE }}:latest
           labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-          cache-from: type=gha,scope=${{ matrix.service }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
 
   deploy:
     needs: images

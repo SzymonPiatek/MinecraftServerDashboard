@@ -12,7 +12,7 @@ main() {
   git fetch --prune origin main
   git merge --ff-only origin/main
 
-  docker compose pull api web
+  docker compose pull api web migrate
   # Recreates only services whose image or config changed, so the Minecraft server isn't restarted needlessly.
   docker compose up -d --remove-orphans
   docker image prune -f >/dev/null

@@ -9,7 +9,7 @@ RUN apt-get update \
 WORKDIR /repo
 
 # Manifests first so the dependency layer is cached until they change.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .pnpmfile.cjs ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/api/package.json apps/api/
 # `postinstall` runs `prisma generate`, which needs the schema and config.
@@ -24,12 +24,31 @@ COPY apps/api apps/api
 RUN pnpm --filter "@mcd/api..." build \
     && pnpm --filter @mcd/api deploy --legacy --prod /out
 
-FROM node:22-bookworm-slim AS runtime
-ENV NODE_ENV=production PORT=4000 DATABASE_URL=file:/data/dashboard.db
+# Prisma CLI (schema engine, studio, ...) is only needed to apply migrations, so it lives in its own image.
+FROM build AS migrate-deps
+RUN V=$(node -p "require('./apps/api/package.json').devDependencies.prisma") \
+    && mkdir /migrate && cd /migrate \
+    && npm init -y >/dev/null \
+    && npm install --no-audit --no-fund "prisma@$V"
+
+FROM node:22-bookworm-slim AS base
 RUN apt-get update \
     && apt-get install -y --no-install-recommends openssl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+
+FROM base AS migrate
+ENV DATABASE_URL=file:/data/dashboard.db
+COPY --from=migrate-deps --chown=node:node /migrate ./
+COPY --from=build --chown=node:node /repo/apps/api/prisma ./prisma
+COPY --from=build --chown=node:node /repo/apps/api/prisma.config.ts ./
+RUN mkdir /data && chown node:node /data
+USER node
+VOLUME /data
+CMD ["node_modules/.bin/prisma", "migrate", "deploy"]
+
+FROM base AS runtime
+ENV NODE_ENV=production PORT=4000 DATABASE_URL=file:/data/dashboard.db
 COPY --from=build --chown=node:node /out ./
 RUN mkdir /data && chown node:node /data
 USER node
@@ -37,4 +56,4 @@ VOLUME /data
 EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
   CMD node -e "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"
-CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && exec node dist/index.js"]
+CMD ["node", "dist/index.js"]
