@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState, type SubmitEvent } from "react";
-import { adminFetch } from "@/lib/admin-api";
+import { useAction } from "@/hooks/use-action";
+import { adminActions } from "@/lib/api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { FeedbackLine } from "./feedback-line";
 import { Panel } from "./panel";
-import { useAction } from "./use-action";
 
 export function WhitelistPanel() {
   const [players, setPlayers] = useState<string[] | null>(null);
@@ -14,7 +14,7 @@ export function WhitelistPanel() {
   const { pending, feedback, run } = useAction();
 
   const load = useCallback(
-    () => run(async () => setPlayers((await adminFetch<{ players: string[] }>("/admin/whitelist")).players)),
+    () => run(async () => setPlayers((await adminActions.getWhitelist()).players)),
     [run],
   );
 
@@ -26,7 +26,7 @@ export function WhitelistPanel() {
     event.preventDefault();
     const name = username.trim();
     const ok = await run(
-      () => adminFetch("/admin/whitelist", { method: "POST", body: { username: name } }).then(() => true),
+      () => adminActions.addToWhitelist(name).then(() => true),
       () => `Dodano ${name}.`,
     );
     if (!ok) return;
@@ -37,7 +37,7 @@ export function WhitelistPanel() {
   async function remove(name: string) {
     if (!window.confirm(`Usunąć ${name} z whitelisty?`)) return;
     const ok = await run(
-      () => adminFetch(`/admin/whitelist/${encodeURIComponent(name)}`, { method: "DELETE" }).then(() => true),
+      () => adminActions.removeFromWhitelist(name).then(() => true),
       () => `Usunięto ${name}.`,
     );
     if (ok) setPlayers((prev) => prev?.filter((p) => p !== name) ?? prev);

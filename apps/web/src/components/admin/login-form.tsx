@@ -2,7 +2,7 @@
 
 import type { AdminSession } from "@mcd/shared";
 import { useState, type SubmitEvent } from "react";
-import { adminFetch, errorMessage } from "@/lib/admin-api";
+import { authActions, errorMessage } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -16,15 +16,12 @@ export function LoginForm({ onLogin }: { onLogin: (admin: AdminSession) => void 
   async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const username = String(form.get("username"));
+    const password = String(form.get("password"));
     setPending(true);
     setError("");
     try {
-      onLogin(
-        await adminFetch<AdminSession>("/auth/login", {
-          method: "POST",
-          body: { username: form.get("username"), password: form.get("password") },
-        }),
-      );
+      onLogin(await authActions.login({ username, password }));
     } catch (e) {
       setError(errorMessage(e));
       setPending(false);
