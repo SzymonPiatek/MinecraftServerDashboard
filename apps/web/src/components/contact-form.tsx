@@ -54,7 +54,7 @@ export function ContactForm() {
           {phase === "sending" ? "Wysyłanie…" : "Wyślij wiadomość"}
         </Button>
         <p role="status" aria-live="polite">
-          {phase === "sent" && "Dzięki! Wiadomość poszła do admina."}
+          {phase === "sent" && "Wiadomość wysłana do admina."}
           {phase === "error" && <span className="font-semibold text-accent-3">{error}</span>}
         </p>
       </div>
